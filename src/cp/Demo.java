@@ -65,10 +65,9 @@ public class Demo extends PApplet {
 		Rectangle[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
 			fill(colors[i]);
-			//int x = (r[i].x == Integer.MAX_VALUE) ? 0 : r[i].x;
 			rect(r[i].x, r[i].y, r[i].width, r[i].height);
-			fill(0, 255, 255);
-			text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
+			//fill(0, 255, 255);
+			//text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
 		}
 	}
 
