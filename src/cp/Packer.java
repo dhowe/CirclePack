@@ -6,17 +6,19 @@ import java.util.ArrayList;
 public class Packer {
 
 	int steps, cx, cy, width, height;
-	float boundingDiameter;
+	float boundingDiameter,boundingDiameter2,ratio;
 	Rectangle[] mer, rec;
 
 	public Packer(Rectangle[] r, int cw, int ch) {
 		
 		this.rec = r;
-		this.cx = Math.round(cw / 2f);
-		this.cy = Math.round(ch / 2f);
 		this.width = cw;
 		this.height = ch;
-		sortByMaxEdge(r);
+		this.ratio = cw/(float)ch;
+		this.cx = Math.round(cw / 2f);
+		this.cy = Math.round(ch / 2f);
+		//sortByMaxEdge(r);
+		sortByArea(r);
 	}
 
 	public int step() {
@@ -95,7 +97,10 @@ public class Packer {
 
 		place(curr, x, y);
 
-		return intersectsPack(curr) ? Float.MAX_VALUE : PU.boundingDiameter(placed(), cx, cy);
+		//float bc = PU.boundingCircle(placed(), cx, cy);
+		float bc2 = PU.boundingCircle2(placed(), cx, cy);
+		//if (bc != bc2) System.out.println("FAIL "+bc+" "+bc2);
+		return intersectsPack(curr) ? Float.MAX_VALUE : bc2;
 	}
 
 	// Dist from center point of rect to center point of pack
@@ -153,7 +158,9 @@ public class Packer {
 
 	Rectangle[] computeMER() {
 
-		boundingDiameter = PU.boundingDiameter(placed(), cx, cy);
+		boundingDiameter = PU.boundingCircle(placed(), cx, cy);
+		boundingDiameter2 = PU.boundingCircle2(placed(), cx, cy);
+		//boundingDiameter = PU.boundingCircle2(placed(), cx, cy);
 
 		// System.out.println("CirclePack.mer() :: "+boundingDiameter+","+boundingDiameter);
 		float merOffsetX = cx - Math.round(boundingDiameter / 2f);

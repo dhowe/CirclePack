@@ -12,7 +12,7 @@ public class EllipseDemo extends ImgDemo {
 	public void init() {
 
 		colors = testSetColors(num);
-		packer = new Packer(PU.testSetVariable(num), width*2, height);
+		packer = new Packer(PU.testSetVariable(num), 2300, 1294);
 		zoom = .5f;
 	}
 	

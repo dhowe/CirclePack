@@ -18,7 +18,8 @@ public class ImgDemo extends PApplet {
 
 		imgs = PU.loadIRects("/Users/dhowe/Desktop/AdCrawl1");
 		packer = new Packer(imgs, width, height);
-		if (paused) advance();
+		if (paused)
+			advance();
 	}
 
 	public void draw() {
@@ -29,7 +30,7 @@ public class ImgDemo extends PApplet {
 		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
 		scale(zoom);
 
-		//drawMer();
+		// drawMer();
 		drawPack(getGraphics());
 		drawBounds();
 
@@ -39,7 +40,7 @@ public class ImgDemo extends PApplet {
 	}
 
 	public void drawPack(PGraphics p) {
-		
+
 		p.stroke(200);
 		for (int i = 0; i < packer.rec.length; i++) {
 			IRect ir = (IRect) packer.rec[i];
@@ -51,8 +52,7 @@ public class ImgDemo extends PApplet {
 
 		fill(0);
 		textSize(24);
-		text(zoom == 1 ? Integer.toString(mouseX) + "," +
-				Integer.toString(mouseY) : "?", 10, 30);
+		text(zoom == 1 ? Integer.toString(mouseX) + "," + Integer.toString(mouseY) : "?", 10, 30);
 	}
 
 	void drawBounds() {
@@ -61,14 +61,16 @@ public class ImgDemo extends PApplet {
 		stroke(255, 0, 255);
 		float diam = packer.boundingDiameter;
 		ellipse(width / 2, height / 2, diam, diam);
+		stroke(0, 155, 155);
+		float diam2 = packer.boundingDiameter2;
+		ellipse(width / 2, height / 2, diam2, diam2);
 	}
 
 	void drawMer() {
 
 		pushMatrix();
 		stroke(100);
-		translate((width - packer.boundingDiameter) / 2, 
-							(height - packer.boundingDiameter) / 2);
+		translate((width - packer.boundingDiameter) / 2, (height - packer.boundingDiameter) / 2);
 		Rectangle[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
@@ -81,10 +83,12 @@ public class ImgDemo extends PApplet {
 	}
 
 	public void advance() {
-		
+
 		if (!packer.complete())
-			System.out.println(packer.steps + ") " + (millis() - ts) +
-				"ms  ("+packer.boundingDiameter+")");		// + packer.mer.length + ")");
+			System.out.println(packer.steps + ") " + (millis() - ts) + "ms  (" + packer.boundingDiameter + ")"); // +
+																																																						// packer.mer.length
+																																																						// +
+																																																						// ")");
 		packer.step();
 		ts = millis();
 	}
@@ -115,7 +119,6 @@ public class ImgDemo extends PApplet {
 			packer = new Packer(imgs, width, height);
 			paused = false;
 		}
-
 	}
 
 	public void mouseWheel(MouseEvent event) {
@@ -138,17 +141,17 @@ public class ImgDemo extends PApplet {
 
 	public void render(String name, float w, float h) {
 
-		PGraphics p = createGraphics((int)(w*1.2), (int)h);
+		PGraphics p = createGraphics((int) (w * 1.2), (int) h);
 		p.beginDraw();
 		p.background(255);
-		p.translate((p.width-width)/2f, (p.height-height)/2f);
+		p.translate((p.width - width) / 2f, (p.height - height) / 2f);
 		p.stroke(200);
 		drawPack(p);
 		p.endDraw();
 		if (p.save(name))
-			System.out.println("Wrote "+name);
+			System.out.println("Wrote " + name);
 		else
-			System.err.println("Write failed for: "+name);
+			System.err.println("Write failed for: " + name);
 	}
 
 	public void settings() {
@@ -156,7 +159,7 @@ public class ImgDemo extends PApplet {
 	}
 
 	public void setup() {
-		//surface.setLocation(800, 0);
+		// surface.setLocation(800, 0);
 		init();
 	}
 

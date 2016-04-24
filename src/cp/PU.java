@@ -57,13 +57,45 @@ public class PU {
 		}
 	}
 
-	static float boundingDiameter(Rectangle[] r, int cx, int cy) {
+	static float[] boundingEllipse(Rectangle[] r, int cx, int cy) {
+		
+		Rectangle b = boundingRect(r);
+		int w = Math.max( Math.abs(cx - b.x), Math.abs(cx - (b.x + b.width )));
+		int h = Math.max( Math.abs(cy - b.y), Math.abs(cy - (b.y + b.height)));
+/*		float tl = dist(b.x, b.y, cx, cy);
+		float tr = dist(b.x+b.width, b.y, cx, cy);
+		float br = dist(b.x, b.y+b.height, cx, cy);
+		float bl = dist(b.x+b.width, b.y+b.height, cx, cy);*/
+		return new float[]{ w*2, h*2 };
+	}
+
+	static Rectangle boundingRect(Rectangle[] r) {
+
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
+				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
+		
+		for (int i = 0; i < r.length; i++) {
+			minX = Math.min(minX, r[i].x);
+			minY = Math.min(minY, r[i].y);
+			maxX = Math.max(maxX, r[i].x + r[i].width);
+			maxY = Math.max(maxY, r[i].y + r[i].height);
+		}
+		
+		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+	}
+
+	static float boundingCircle(Rectangle[] r, int cx, int cy) {
+		float[] be = boundingEllipse(r, cx, cy);
+		return Math.max(be[0], be[1]);
+	}
+	
+	static float boundingCircle2(Rectangle[] r, int cx, int cy) {
 
 		float maxRadiusSoFar = 0;
 		for (int i = 0; i < r.length; i++) {
-			float d1 = dist(r[i].x, r[i].y, cx, cy); // upper-left
-			float d2 = dist(r[i].x + r[i].width, r[i].y, cx, cy); // upper-right
-			float d3 = dist(r[i].x, r[i].y + r[i].height, cx, cy); // lower-left
+			float d1 = dist(r[i].x, r[i].y, cx, cy); 														// upper-left
+			float d2 = dist(r[i].x + r[i].width, r[i].y, cx, cy); 						  // upper-right
+			float d3 = dist(r[i].x, r[i].y + r[i].height, cx, cy); 							// lower-left
 			float d4 = dist(r[i].x + r[i].width, r[i].y + r[i].height, cx, cy); // lower-right
 			float maxOfCorners = Math.max(Math.max(d1, d2), Math.max(d3, d4));
 			maxRadiusSoFar = Math.max(maxRadiusSoFar, maxOfCorners);
