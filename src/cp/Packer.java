@@ -1,6 +1,7 @@
 package cp;
 
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.util.ArrayList;
 
 public class Packer {
@@ -19,24 +20,24 @@ public class Packer {
 		alignVertically();
 	}
 	
-	public Rectangle step() {	
+	public int step() {	
 		
 		//System.out.println("STEP #"+steps);
-		
-		Rectangle curr = null;
-		
 		if (steps < rec.length) {
 
-			curr = rec[steps];
+			Rectangle curr = rec[steps];
 			if (steps > 0) {
 				
 				float bestMaxCornerDist = Float.MAX_VALUE;
 				float bestMaxCenterDist = Float.MAX_VALUE;
+				
 				for (int i = 0; i < mer.length; i++) {
 
 					for (int j = 0; j < 4; j++) {
+						
 						int px = curr.x, py = curr.y;
-						float dia = check(curr, mer[i], j);
+						float dia = testPlacement(curr, mer[i], j);
+						
 						if (dia < bestMaxCornerDist) {
 							bestMaxCornerDist = dia;
 							bestMaxCenterDist = centerPointDist(curr);
@@ -46,6 +47,7 @@ public class Packer {
 							bestMaxCenterDist = centerPointDist(curr);
 						}
 						else {
+							
 							place(curr, px, py); // revert
 						}
 					}
@@ -56,14 +58,16 @@ public class Packer {
 				center(curr, cx, cy);
 			}
 			
-			mer = computeMER();
+			mer = computeMER();			
+			//System.out.println(steps+") placed: "+curr.x+","+curr.y);
 			++steps;
 		}
 		
-		return curr;
+		
+		return steps;
 	}
 
-	float check(Rectangle curr, Rectangle mer, int type) {
+	float testPlacement(Rectangle curr, Rectangle mer, int type) {
 		 
 		int x = -1, mx = mer.x + Math.round( (width - boundingDiameter) / 2f);
 		int y = -1, my = mer.y + Math.round( (height - boundingDiameter) / 2f);
@@ -92,8 +96,7 @@ public class Packer {
 		
 		place(curr, x, y);
 		
-		Rectangle[] placed = placed();
-		return intersectsPack(curr) ? Float.MAX_VALUE : PU.boundingDiameter(placed, cx, cy);
+		return intersectsPack(curr) ? Float.MAX_VALUE : PU.boundingDiameter(placed(), cx, cy);
 	}
 	
 	// Dist from center point of rect to center point of pack
@@ -120,13 +123,20 @@ public class Packer {
 		});
 	}
 	
+	void sortByArea(Shape[] r) {
+		java.util.Arrays.sort(r, new java.util.Comparator<Shape>() {
+			public int compare(Shape s1, Shape s2) {
+				Rectangle a = s1.getBounds(), b = s2.getBounds();
+				return Float.compare(a.width * a.height, b.width * b.height);
+			}
+		});
+	}
+	
 	boolean intersectsPack(Rectangle curr) {
 		Rectangle[] pack = placed();
 		for (int i = 0; i < pack.length; i++) {
-			if (pack[i].x >= 0) { // ignore unplace rects
-				if (curr != pack[i] && curr.intersects(pack[i]))
-					return true;
-			}
+			if (curr != pack[i] && curr.intersects(pack[i]))
+				return true;
 		}
 		return false;
 	}

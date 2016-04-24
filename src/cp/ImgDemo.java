@@ -2,42 +2,61 @@ package cp;
 
 import java.awt.Rectangle;
 
-import processing.core.PApplet;
-import processing.core.PGraphics;
+import processing.core.*;
 import processing.event.MouseEvent;
 
-public class Demo extends PApplet {
+public class ImgDemo extends PApplet {
 
 	boolean paused = false;
-	float minZoom = .1f, zoom = .5f;
-	int num = 100, colors[];
-	
+	float minZoom = .1f, zoom = .1f;
+	int animateMs = 1, ts = -1;
+
 	Packer packer;
+	IRect[] imgs;
 
 	public void init() {
 
-		colors = testSetColors(num);
-		packer = new Packer(PU.testSetVariable(num), width, height);
-		packer.step();
-		frameRate(8);
+		imgs = PU.loadIRects("/Users/dhowe/Desktop/AdCrawl1");
+		packer = new Packer(imgs, width, height);
+		if (paused)
+			advance();
 	}
 
 	public void draw() {
-		
-		background(255);
 
-		translate((1-zoom)*width/2, (1-zoom)*height/2);
+		background(255);
+		fill(100);
+		text("[p]ause, [r]eset, [c]lear, [g]enerate, space-bar to step, mouse-wheel to zoom", 10, 20);
+		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
 		scale(zoom);
 
-		//drawMer();
+		// drawMer();
 		drawPack();
 		drawBounds();
-		
-		if (!paused) packer.step();
+
+		if (!paused && (millis() - ts >= animateMs)) {
+			advance();
+		}
+	}
+
+	public void drawPack() {
+		stroke(200);
+
+		for (int i = 0; i < packer.rec.length; i++) {
+			IRect ir = (IRect) packer.rec[i];
+			image(ir.image, ir.x, ir.y, imgs[i].width, imgs[i].height);
+		}
+	}
+
+	private void drawMouseCoords() {
+
+		fill(0);
+		textSize(24);
+		text(zoom == 1 ? (int) mouseX + "," + (int) mouseY : "?", 10, 30);
 	}
 
 	void drawBounds() {
-		
+
 		noFill();
 		stroke(255, 0, 255);
 		float diam = packer.boundingDiameter;
@@ -45,13 +64,13 @@ public class Demo extends PApplet {
 	}
 
 	void drawMer() {
-		
+
 		pushMatrix();
 		stroke(200);
 		translate((width - packer.boundingDiameter) / 2, (height - packer.boundingDiameter) / 2);
-		Rectangle[] r = packer.mer; 
-		
-		for (int i = 0; r!=null && i < r.length; i++) {
+		Rectangle[] r = packer.mer;
+
+		for (int i = 0; r != null && i < r.length; i++) {
 			noFill();
 			rect(r[i].x, r[i].y, r[i].width, r[i].height);
 			fill(0);
@@ -60,47 +79,41 @@ public class Demo extends PApplet {
 		popMatrix();
 	}
 
-	void drawPack() {
-		stroke(200);
-		Rectangle[] r = packer.rec;
-		for (int i = 0; i < r.length; i++) {
-			fill(colors[i]);
-			rect(r[i].x, r[i].y, r[i].width, r[i].height);
-			//fill(0, 255, 255);
-			//text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
-		}
+	public void advance() {
+		if (packer.steps > 0)
+			System.out.println(packer.steps + ") " + (millis() - ts) + "ms  ("+packer.boundingDiameter+")");		// + packer.mer.length + ")");
+		packer.step();
+		ts = millis();
 	}
 
 	public void keyPressed() {
-		
+
 		if (key == ' ') {
-			if (paused) packer.step();
-			else paused = true;
-		}
-		else if (key == 'p') 
+			if (paused)
+				advance();
+			else
+				paused = true;
+		} else if (key == 'p')
 			paused = !paused;
 		else if (key == 'c') {
 			noLoop();
 			packer.reset();
 			redraw();
 			packer.reset();
-			packer.step();
+			advance();
 			loop();
-		}
-		else if (key == 'r') {
+		} else if (key == 'r') {
 			packer.reset();
 			paused = false;
-		}
-		else if (key == 'g') {
-			packer = new Packer(PU.testSetVariable(num), width, height);
+		} else if (key == 'g') {
+			packer = new Packer(imgs, width, height);
 			paused = false;
 		}
 
-	
 	}
 
 	/***********************************************************************************/
-	
+
 	public void mouseWheel(MouseEvent event) {
 		@SuppressWarnings("deprecation")
 		float e = event.getAmount();
@@ -113,13 +126,12 @@ public class Demo extends PApplet {
 	int[] testSetColors(int num) {
 		int[] colors = new int[num];
 		for (int i = 0; i < colors.length; i++) {
-			float r = random(0,150);
-			colors[i] = color(225-r, random(0,r), 100+r);
+			float r = random(0, 150);
+			colors[i] = color(225 - r, random(0, r), 100 + r);
 		}
 		return colors;
 	}
 
-	
 	public void render(String name, int w, int h) {
 
 		PGraphics p = createGraphics(w, 4000);
@@ -134,12 +146,12 @@ public class Demo extends PApplet {
 	}
 
 	public void setup() {
-		surface.setLocation(1200, 0);
+		surface.setLocation(800, 0);
 		init();
 	}
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { Demo.class.getName() });
+		PApplet.main(new String[] { ImgDemo.class.getName() });
 	}
 }
