@@ -5,17 +5,19 @@ import java.awt.Rectangle;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class RectDemo extends ImgDemo {
+public class EllipseDemo extends ImgDemo {
 
 	int num = 100, colors[];
 
 	public void init() {
 
 		colors = testSetColors(num);
-		packer = new Packer(PU.testSetVariable(num), width, height);
+		packer = new Packer(PU.testSetVariable(num), width*2, height);
+		zoom = .5f;
 	}
 	
 	public void drawPack(PGraphics p) {
+		
 		p.stroke(200);
 		Rectangle[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
@@ -28,6 +30,6 @@ public class RectDemo extends ImgDemo {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { RectDemo.class.getName() });
+		PApplet.main(new String[] { EllipseDemo.class.getName() });
 	}
 }

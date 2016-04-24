@@ -1,6 +1,7 @@
 package cp;
 
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -80,14 +81,15 @@ public class PU {
 		return (f * f);
 	}
 
-	static void sortByMaxEdge(Rectangle[] r) {
-		java.util.Arrays.sort(r, new java.util.Comparator<Rectangle>() {
-			public int compare(Rectangle b, Rectangle a) {
-				return Float.compare(Math.max(a.width, a.height), Math.max(b.width, b.height));
+	static void sortByArea(Shape[] r) {
+		java.util.Arrays.sort(r, new java.util.Comparator<Shape>() {
+			public int compare(Shape s1, Shape s2) {
+				Rectangle a = s1.getBounds(), b = s2.getBounds();
+				return Float.compare(a.width * a.height, b.width * b.height);
 			}
 		});
 	}
-
+	
 	static Rectangle[] testSetVariable(int num) {
 		Rectangle[] r = new Rectangle[num];
 		for (int i = 0; i < r.length; i++) {
