@@ -5,20 +5,21 @@ import java.util.ArrayList;
 
 public class Packer {
 
-	int steps;
 	Ellipse bounds;
 	Rectangle[] mer, rec;
-	float ratio,width,height;
+	float ratio, width, height;
+	int steps;
 
-	public Packer(Rectangle[] r, int cw, int ch) {
+	public Packer(Rectangle[] r, float cw, float ch) {
 		
 		this.rec = r;
 		this.width = cw;
 		this.height = ch;
-		this.ratio = cw/(float)ch;
-		this.bounds = new Ellipse(Math.round(cw / 2f), Math.round(ch / 2f), cw, ch);
-		sortByMaxEdge(r);
-		//sortByArea(r);
+		this.ratio = cw / ch;
+		System.out.println(cw+"x"+ch+" ratio: "+ratio);
+		this.bounds = new Ellipse(Math.round(cw/2f), Math.round(ch/2f), cw, ch);
+		//sortByMaxEdge(r);
+		sortByArea(r);
 	}
 
 	public int step() {
@@ -96,10 +97,11 @@ public class Packer {
 		}
 
 		place(curr, x, y);
+		
+		// WORKING HERE
+		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); // fitness function
 
-		//float bc = PU.boundingCircle(placed(), bounds.x, bounds.y);
-		//if (bc != bc2) System.out.println("FAIL "+bc+" "+bc2);
-		return intersectsPack(curr) ? Float.MAX_VALUE : bounds.area();
+		return intersectsPack(curr) ? Float.MAX_VALUE : totalArea;
 	}
 
 	// Dist from center point of rect to center point of pack
@@ -158,20 +160,13 @@ public class Packer {
 	Rectangle[] computeMER() {
 
 		Rectangle[] sofar = placed();
-		Ellipse be = PU.boundingEllipse(sofar, bounds.x, bounds.y);
-		bounds.width = be.width;
-		bounds.height = be.height;
-		
-		int[][] imer = Mer.rectsToMer(sofar);
-		
-		int merOffsetX = bounds.x - Math.round(bounds.width / 2f),
-				merOffsetY = bounds.y - Math.round(bounds.height / 2f);
-		
-		for (int i = 0; i < imer.length; i++) { // shift by offset
-			imer[i][1] -= merOffsetX;
-			imer[i][0] -= merOffsetY;
-		}
+		bounds = PU.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
 
+		// translate packed rects from bounds.x/bounds.y to 0,0
+		int[][] imer = Mer.rectsToMer(sofar, 
+				-bounds.x + Math.round(bounds.width / 2f), 
+				-bounds.y + Math.round(bounds.height / 2f) );
+	
 		int rbw = Math.round(bounds.width);
 		int rbh = Math.round(bounds.height);
 		imer = Mer.MER(rbh, rbw, imer);
@@ -181,23 +176,10 @@ public class Packer {
 		return validateMer(result);
 	}
 
-	// convert rect{x,y,w,h,} to 4 corner points
-	public int[] toCorners(Rectangle b, boolean tf) {
-
-		int bx = b.x + Math.round((tf ? (width - bounds.width) / 2f : 0));
-		int by = b.y + Math.round((tf ? (height - bounds.height) / 2f : 0));
-
-		int tlX = bx, tlY = by;
-		int trX = bx + b.width, trY = by;
-		int brX = bx + b.width, brY = by + b.height;
-		int blX = bx, blY = by + b.height;
-
-		return new int[] { tlX, tlY, trX, trY, brX, brY, blX, blY };
-	}
-
 	/*
 	 * For each rectangle in the MER, check that all four corners are not outside
 	 * the boundingCircle. If any are, split them into two...
+	 * TODO: check orientation for split
 	 */
 	Rectangle[] validateMer(Rectangle[] mer) {
 
@@ -206,13 +188,11 @@ public class Packer {
 		for (int i = 0; i < mer.length; i++) {
 			
 			//System.out.println(i+") "+mer[i]);
-
 			int[] cr = toCorners(mer[i], true); // TODO: REMOVE TRANSFORMS
 			
 			boolean inside = false;
 			for (int j = 0; j < cr.length; j += 2) {
-				//System.out.println("Checking corner #"+(j/2)+" of MER#"+i+": "+cr[j]+","+cr[j + 1]+" "+bounds.containsVal(cr[j], cr[j + 1]));
-
+				//System.out.println("Checking corner #"+(j/2)+" of MER#"+i+": "+cr[j]+","+cr[j + 1]);
 				if (bounds.contains(cr[j], cr[j + 1])) {
 					//System.out.println("Corner #"+(j/2)+" of MER#"+i+" inside ellipse");
 					inside = true;
@@ -223,7 +203,7 @@ public class Packer {
 			
 			if (!inside) {  // all four corners are outside our bounds
 				
-				if (i != 0)System.out.println("*** MER#" + i + " SPLITTING... (no points inside bounds)");
+				if (i != 0)System.out.println("*** MER#" + i + " SPLITTING...");
 				mer[i].width /= 2;
 				rl.add(new Rectangle(mer[i].x + mer[i].width, mer[i].y, mer[i].width, mer[i].height));
 			}
@@ -232,6 +212,18 @@ public class Packer {
 		return rl.toArray(new Rectangle[0]);
 	}
 
+	/* convert rect{x,y,w,h,} to 4 corner points */
+	public int[] toCorners(Rectangle b, boolean tf) {
+
+		int tlX = b.x + (tf ? Math.round( (width - bounds.width)   / 2f) : 0);
+		int tlY = b.y + (tf ? Math.round( (height - bounds.height) / 2f) : 0);
+		int trX = tlX + b.width, trY = tlY;
+		int blX = tlX, blY = tlY + b.height;
+		int brX = tlX + b.width, brY = tlY + b.height;
+
+		return new int[] { tlX, tlY, trX, trY, brX, brY, blX, blY };
+	}
+	
 	public boolean complete() {
 		return steps >= rec.length;
 	}

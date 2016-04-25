@@ -1,7 +1,6 @@
 package cp;
 
 import java.awt.Rectangle;
-import java.awt.geom.Ellipse2D;
 
 import processing.core.PApplet;
 
@@ -20,7 +19,7 @@ public class EllipticalArea extends PApplet {
 			r[i].x = (int) random(200,600);
 			r[i].y = (int) random(200,400);
 			r[i].width = (int) random(50,300);
-			r[i].height = (int) random(50,400);
+			r[i].height = (int) random(50,100);
 		}
 	}
 	
@@ -38,8 +37,7 @@ public class EllipticalArea extends PApplet {
 		}
 		
 		int cx = width/2, cy = height/2;
-		Ellipse be = PU.boundingEllipse(r, cx, cy);
-		//Ellipse2D be2 = new Ellipse2D.Float(be.x,be.y,be.width,be.height);
+		Ellipse be = PU.boundingEllipse(r, cx, cy,.5f);
 		Rectangle br = PU.alignedBoundingRect(r, cx, cy);
 		
 		noFill();

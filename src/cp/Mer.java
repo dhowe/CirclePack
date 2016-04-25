@@ -31,16 +31,21 @@ public class Mer {
 		return r;
 	}
 	
-	public static int[][] rectsToMer(Rectangle[] f) {
+	public static int[][] rectsToMer(Rectangle[] f, int tx, int ty) {
+
 		int[][] mer = new int[f.length][];
 		for (int i = 0; i < f.length; i++) {
 			mer[i] = new int[4];
-			mer[i][0] = f[i].y;
-			mer[i][1] = f[i].x;
+			mer[i][0] = f[i].y + ty;
+			mer[i][1] = f[i].x + tx;
 			mer[i][2] = f[i].height;
 			mer[i][3] = f[i].width;
 		}
 		return mer;
+	}
+	
+	public static int[][] rectsToMer(Rectangle[] r) {
+		return rectsToMer(r, 0, 0);
 	}
 
 	public static int[][] MER(int rows, int cols, int[][] r) {

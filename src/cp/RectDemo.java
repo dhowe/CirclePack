@@ -12,9 +12,8 @@ public class RectDemo extends ImgDemo {
 	public void init() {
 
 		zoom = 1f;
-		packer = new Packer(testset(num), width, height);
+		packer = new Packer(testset(num), width, height/4);
 		if (paused) advance();
-		
 	}
 	
 	private Rectangle[] testset(int num) {
@@ -33,21 +32,6 @@ public class RectDemo extends ImgDemo {
 			//p.fill(0, 255, 255);
 			//p.text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
 		}
-//		
-//		//merCorners(p);
-//		
-//		Ellipse e = new Ellipse(width/2,height/2,packer.boundingW, packer.boundingH);
-//		p.noStroke();
-//		float a = 0;
-//		if (e.contains(mouseX, mouseY)) {
-//			a = 128;
-//		}
-//		
-//		p.fill(200,0,0,a);
-//		p.ellipse(e.x,e.y,e.width, e.height);
-//		p.fill(0);
-//
-//		p.ellipse(mouseX,mouseY,3,3);
 	}
 	
 	public void merCorners(PGraphics p) {
@@ -65,12 +49,11 @@ public class RectDemo extends ImgDemo {
 
 	public void keyPressed() {
 		if (key == 'g') {
-			packer = new Packer(testset(num), width, height);
+			packer = new Packer(testset(num), packer.width, packer.height);
 			if (paused) advance();
+			return;
 		}
-		else {
-			super.keyPressed();
-		}
+		super.keyPressed();
 	}
 	
 	public static void main(String[] args) {
