@@ -1,9 +1,9 @@
 package cp;
 
 import java.awt.Rectangle;
+import java.awt.geom.Ellipse2D;
 
 import processing.core.PApplet;
-import processing.core.PGraphics;
 
 public class EllipticalArea extends PApplet {
 
@@ -14,13 +14,16 @@ public class EllipticalArea extends PApplet {
 	}
 
 	public void setup() {
-		r = new Rectangle[10];
+		r = new Rectangle[5];
 		for (int i = 0; i < r.length; i++) {
 			r[i] = new Rectangle();
 			r[i].x = (int) random(200,600);
 			r[i].y = (int) random(200,400);
+
 			r[i].width = (int) random(50,300);
 			r[i].height = (int) random(50,400);
+			//r[i].x = Math.round(width/2f - r[i].width/2f);
+			//r[i].y = Math.round(height/2f - r[i].height/2f);
 		}
 	}
 	
@@ -37,11 +40,17 @@ public class EllipticalArea extends PApplet {
 			rect(r[i].x,r[i].y,r[i].width,r[i].height);
 		}
 		
-		//int cx = width/2, cy = height/2;
-		int cx = mouseX>100?mouseX:width/2, cy = mouseY>100?mouseY:height/2;
-		float[] be = PU.boundingEllipse(r, cx, cy);
+		int cx = width/2, cy = height/2;
+		Ellipse be = PU.boundingEllipse(r, cx, cy);
+		//Ellipse2D be2 = new Ellipse2D.Float(be.x,be.y,be.width,be.height);
+		Rectangle br = PU.alignedBoundingRect(r, cx, cy);
 		
-		ellipse(cx,cy,be[0],be[1]);
+		noFill();
+		if (be.contains(mouseX, mouseY))
+			fill(200,0,0,64);
+		stroke(200,200,0);
+		ellipse(be.x,be.y,be.width,be.height);
+		rect(br.x,br.y,br.width,br.height);
 		fill(0);
 		noStroke();
 		ellipse(cx,cy,5,5);

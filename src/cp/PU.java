@@ -2,6 +2,7 @@ package cp;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -9,9 +10,8 @@ import java.util.List;
 
 public class PU {
 
-	static int[] AdSizes = { 728, 90, 300, 250, 300, 600, 320, 100, 336, 280,
-	// 1940, 88,
-	};
+	static final float SQRT2 = (float) Math.sqrt(2);
+	static int[] AdSizes = { 728, 90, 300, 250, 300, 600, 320, 100, 336, 280 }; 	// 1940, 88,
 
 	static boolean isImage(File file) {
 
@@ -57,18 +57,42 @@ public class PU {
 		}
 	}
 
-	static float[] boundingEllipse(Rectangle[] r, int cx, int cy) {
-		
-		Rectangle b = boundingRect(r);
-		int w = Math.max( Math.abs(cx - b.x), Math.abs(cx - (b.x + b.width )));
-		int h = Math.max( Math.abs(cy - b.y), Math.abs(cy - (b.y + b.height)));
-/*		float tl = dist(b.x, b.y, cx, cy);
-		float tr = dist(b.x+b.width, b.y, cx, cy);
-		float br = dist(b.x, b.y+b.height, cx, cy);
-		float bl = dist(b.x+b.width, b.y+b.height, cx, cy);*/
-		return new float[]{ w*2, h*2 };
-	}
+	static Ellipse boundingEllipse(Rectangle[] r, int cx, int cy) {
 
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
+				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
+		
+		for (int i = 0; i < r.length; i++) {
+			minX = Math.min(minX, r[i].x);
+			minY = Math.min(minY, r[i].y);
+			maxX = Math.max(maxX, r[i].x + r[i].width);
+			maxY = Math.max(maxY, r[i].y + r[i].height);
+		}
+		
+		int w = Math.round(Math.max(Math.abs(minX-cx), Math.abs(maxX-cx)));
+		int h = Math.round(Math.max(Math.abs(minY-cy), Math.abs(maxY-cy)));
+		
+		return new Ellipse(cx, cy, w*2*SQRT2, h*2*SQRT2);
+	}
+	
+	static Rectangle alignedBoundingRect(Rectangle[] r, int cx, int cy) {
+
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
+				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
+		
+		for (int i = 0; i < r.length; i++) {
+			minX = Math.min(minX, r[i].x);
+			minY = Math.min(minY, r[i].y);
+			maxX = Math.max(maxX, r[i].x + r[i].width);
+			maxY = Math.max(maxY, r[i].y + r[i].height);
+		}
+		
+		int w = Math.round(Math.max(Math.abs(minX-cx), Math.abs(maxX-cx)));
+		int h = Math.round(Math.max(Math.abs(minY-cy), Math.abs(maxY-cy)));
+		
+		return new Rectangle(cx-w, cy-h, w*2, h*2);
+	}
+	
 	static Rectangle boundingRect(Rectangle[] r) {
 
 		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
@@ -84,12 +108,12 @@ public class PU {
 		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
 	}
 
-	static float boundingCircle(Rectangle[] r, int cx, int cy) {
-		float[] be = boundingEllipse(r, cx, cy);
-		return Math.max(be[0], be[1]);
+	static float boundingCircleDiameter(Rectangle[] r, int cx, int cy) { 
+		Ellipse be = boundingEllipse(r, cx, cy);
+		return Math.max(be.width, be.height);
 	}
 	
-	static float boundingCircle2(Rectangle[] r, int cx, int cy) {
+	static float boundingCircleOld(Rectangle[] r, int cx, int cy) { // not used
 
 		float maxRadiusSoFar = 0;
 		for (int i = 0; i < r.length; i++) {
@@ -103,7 +127,7 @@ public class PU {
 
 		return maxRadiusSoFar * 2;
 	}
-
+	
 	static float dist(float x1, float y1, float x2, float y2) {
 
 		return (float) Math.sqrt(sq(x2 - x1) + sq(y2 - y1));
@@ -241,4 +265,14 @@ public class PU {
 
 	}
 
+	// convert rect{x,y,w,h,} to 4 corner points
+	public static int[] toCorners(Rectangle r) {
+	
+			int tlX = r.x, tlY = r.y;
+			int trX = r.x + r.width, trY = r.y;
+			int brX = r.x + r.width, brY = r.y + r.height;
+			int blX = r.x, blY = r.y + r.height;
+
+			return new int[] { tlX, tlY, trX, trY, brX, brY, blX, blY };
+		}
 }
