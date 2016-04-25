@@ -19,11 +19,8 @@ public class EllipticalArea extends PApplet {
 			r[i] = new Rectangle();
 			r[i].x = (int) random(200,600);
 			r[i].y = (int) random(200,400);
-
 			r[i].width = (int) random(50,300);
 			r[i].height = (int) random(50,400);
-			//r[i].x = Math.round(width/2f - r[i].width/2f);
-			//r[i].y = Math.round(height/2f - r[i].height/2f);
 		}
 	}
 	

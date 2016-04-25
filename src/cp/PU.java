@@ -2,7 +2,6 @@ package cp;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;

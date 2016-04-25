@@ -37,8 +37,6 @@ public class ImgDemo extends PApplet {
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
 		}
-		
-
 	}
 
 	public void drawPack(PGraphics p) {
@@ -61,8 +59,8 @@ public class ImgDemo extends PApplet {
 
 		noFill();
 		stroke(255, 0, 255);
-//		float diam = packer.boundingW;
-		ellipse(width / 2, height / 2, packer.boundingW, packer.boundingH);
+//		float diam = packer.bounds.width;
+		ellipse(width / 2, height / 2, packer.bounds.width, packer.bounds.height);
 		stroke(0, 155, 155);
 		//diam = packer.boundingDiameter2;
 		//ellipse(width / 2, height / 2, diam, diam);
@@ -72,7 +70,7 @@ public class ImgDemo extends PApplet {
 
 		pushMatrix();
 		stroke(100);
-		translate((width - packer.boundingW) / 2, (height - packer.boundingH) / 2);
+		translate((width - packer.bounds.width) / 2, (height - packer.bounds.height) / 2);
 		Rectangle[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
@@ -88,7 +86,7 @@ public class ImgDemo extends PApplet {
 	public void advance() {
 
 		if (!packer.complete())
-			System.out.println(packer.steps + ") " + (millis() - ts)+"ms");//  (" + packer.boundingW + ")"); 																																													// ")");
+			System.out.println(packer.steps + ") " + (millis() - ts)+"ms");//  (" + packer.bounds.width + ")"); 																																													// ")");
 		packer.step();
 		ts = millis();
 	}
@@ -115,7 +113,7 @@ public class ImgDemo extends PApplet {
 				advance();
 		} else if (key == 's') {
 			paused = true;
-			render("/Users/dhowe/Desktop/rendered.png", packer.boundingW, packer.boundingH);
+			render("/Users/dhowe/Desktop/rendered.png", packer.bounds.width, packer.bounds.height);
 		} 
 	}
 

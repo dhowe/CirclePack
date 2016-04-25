@@ -43,6 +43,10 @@ public class Ellipse {
 		return left+right;
 	}
 
+	public float area() {
+		return (float) (Math.PI * width/2d * height/2d);
+	}
+	
 	public boolean contains(float X, float Y) {
 		if (width <= 0.0 || height <= 0.0) return false;
 		float dx = X - x, rx = width/2f;
