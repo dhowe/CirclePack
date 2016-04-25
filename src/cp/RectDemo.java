@@ -12,7 +12,8 @@ public class RectDemo extends ImgDemo {
 	public void init() {
 
 		zoom = 1f;
-		packer = new Packer(testset(num), width, height/4);
+		packer = new Packer(testset(num), width, height);
+		packer.ratio = 2;
 		if (paused) advance();
 	}
 	
@@ -35,6 +36,7 @@ public class RectDemo extends ImgDemo {
 	}
 	
 	public void merCorners(PGraphics p) {
+		
 		noStroke();
 		fill(0);
 		Rectangle[] r = packer.mer;

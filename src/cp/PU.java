@@ -91,7 +91,7 @@ public class PU {
 			rx = Math.round(ry * ratio);
 		}
 		
-		return new Ellipse(cx, cy, rx*2*SQRT2, ry*2*SQRT2);
+		return new Ellipse(cx, cy, rx*2, ry*2);
 	}
 	
 //	static Ellipse boundingEllipseOrig(Rectangle[] r, int cx, int cy) {
