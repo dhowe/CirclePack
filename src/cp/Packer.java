@@ -1,24 +1,23 @@
 package cp;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 
 public class Packer {
 
 	Ellipse bounds;
-	Rectangle[] mer, rec;
+	Rect[] mer, rec;
 	float ratio, width, height;
 	int steps;
 
-	public Packer(Rectangle[] r, float cw, float ch) {
-		
+	public Packer(Rect[] r, float cw, float ch) {
+
 		this.rec = r;
 		this.width = cw;
 		this.height = ch;
 		this.ratio = cw / ch;
-		System.out.println(cw+"x"+ch+" ratio: "+ratio);
-		this.bounds = new Ellipse(Math.round(cw/2f), Math.round(ch/2f), cw, ch);
-		//sortByMaxEdge(r);
+		System.out.println(cw + "x" + ch + " ratio: " + ratio);
+		this.bounds = new Ellipse(Math.round(cw / 2f), Math.round(ch / 2f), cw, ch);
+		// sortByMaxEdge(r);
 		sortByArea(r);
 	}
 
@@ -27,7 +26,7 @@ public class Packer {
 		// System.out.println("STEP #"+steps);
 		if (steps < rec.length) {
 
-			Rectangle curr = rec[steps];
+			Rect curr = rec[steps];
 			if (steps > 0) {
 
 				float bestMaxCornerDist = Float.MAX_VALUE;
@@ -41,15 +40,15 @@ public class Packer {
 						float dia = testPlacement(curr, mer[i], j);
 
 						if (dia < bestMaxCornerDist) {
-							
+
 							bestMaxCornerDist = dia;
 							bestMaxCenterDist = centerPointDist(curr);
-						
+
 						} else if (dia == bestMaxCornerDist && centerPointDist(curr) < bestMaxCenterDist) {
-							
+
 							bestMaxCornerDist = dia;
 							bestMaxCenterDist = centerPointDist(curr);
-							
+
 						} else {
 
 							place(curr, px, py); // revert
@@ -69,7 +68,7 @@ public class Packer {
 		return steps;
 	}
 
-	float testPlacement(Rectangle curr, Rectangle mer, int type) {
+	float testPlacement(Rect curr, Rect mer, int type) {
 
 		int x = -1, mx = mer.x + Math.round((width - bounds.width) / 2f);
 		int y = -1, my = mer.y + Math.round((height - bounds.height) / 2f);
@@ -97,39 +96,40 @@ public class Packer {
 		}
 
 		place(curr, x, y);
-		
+
 		// WORKING HERE
-		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); // fitness function
+		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); // fitness
+																																										// function
 
 		return intersectsPack(curr) ? Float.MAX_VALUE : totalArea;
 	}
 
 	// Dist from center point of rect to center point of pack
-	float centerPointDist(Rectangle r) {
+	float centerPointDist(Rect r) {
 
 		int rx = r.x + Math.round(r.width / 2f);
 		int ry = r.y + Math.round(r.height / 2f);
 		return PU.dist(rx, ry, bounds.x, bounds.y);
 	}
 
-	void sortByArea(Rectangle[] r) {
-		java.util.Arrays.sort(r, new java.util.Comparator<Rectangle>() {
-			public int compare(Rectangle b, Rectangle a) {
+	void sortByArea(Rect[] r) {
+		java.util.Arrays.sort(r, new java.util.Comparator<Rect>() {
+			public int compare(Rect b, Rect a) {
 				return Float.compare(a.width * a.height, b.width * b.height);
 			}
 		});
 	}
-	
-	static void sortByMaxEdge(Rectangle[] r) {
-		java.util.Arrays.sort(r, new java.util.Comparator<Rectangle>() {
-			public int compare(Rectangle b, Rectangle a) {
+
+	static void sortByMaxEdge(Rect[] r) {
+		java.util.Arrays.sort(r, new java.util.Comparator<Rect>() {
+			public int compare(Rect b, Rect a) {
 				return Float.compare(Math.max(a.width, a.height), Math.max(b.width, b.height));
 			}
 		});
 	}
-	
-	boolean intersectsPack(Rectangle curr) {
-		Rectangle[] pack = placed();
+
+	boolean intersectsPack(Rect curr) {
+		Rect[] pack = placed();
 		for (int i = 0; i < pack.length; i++) {
 			if (curr != pack[i] && curr.intersects(pack[i]))
 				return true;
@@ -137,94 +137,92 @@ public class Packer {
 		return false;
 	}
 
-	void center(Rectangle r, int x, int y) {
+	void center(Rect r, int x, int y) {
 		r.x = x - Math.round(r.width / 2f);
 		r.y = y - Math.round(r.height / 2f);
 	}
 
-	void place(Rectangle r, int x, int y) {
+	void place(Rect r, int x, int y) {
 		r.x = x;
 		r.y = y;
 	}
 
-	Rectangle[] placed() {
+	Rect[] placed() {
 
-		ArrayList<Rectangle> p = new ArrayList<Rectangle>();
+		ArrayList<Rect> p = new ArrayList<Rect>();
 		for (int i = 0; i < rec.length; i++) {
 			if (rec[i].x != Integer.MAX_VALUE)
 				p.add(rec[i]);
 		}
-		return p.toArray(new Rectangle[0]);
+		return p.toArray(new Rect[0]);
 	}
 
-	Rectangle[] computeMER() {
+	Rect[] computeMER() {
 
-		Rectangle[] sofar = placed();
+		Rect[] sofar = placed();
 		bounds = PU.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
 
 		// translate packed rects from bounds.x/bounds.y to 0,0
-		int[][] imer = Mer.rectsToMer(sofar, 
-				-bounds.x + Math.round(bounds.width / 2f), 
-				-bounds.y + Math.round(bounds.height / 2f) );
-	
+		int[][] imer = Mer.rectsToMer(sofar, -bounds.x + Math.round(bounds.width / 2f),
+				-bounds.y + Math.round(bounds.height / 2f));
+
 		int rbw = Math.round(bounds.width);
 		int rbh = Math.round(bounds.height);
 		imer = Mer.MER(rbh, rbw, imer);
 
-		Rectangle[] result = Mer.merToRects(imer);
+		Rect[] result = Mer.merToRects(imer);
 
 		return validateMer(result);
 	}
 
 	/*
 	 * For each rectangle in the MER, check that all four corners are not outside
-	 * the boundingCircle. If any are, split them into two...
-	 * TODO: check orientation for split
+	 * the boundingCircle. If any are, split them into two... TODO: check
+	 * orientation for split
 	 */
-	Rectangle[] validateMer(Rectangle[] mer) {
+	Rect[] validateMer(Rect[] mer) {
 
-		ArrayList<Rectangle> rl = new ArrayList<Rectangle>();
+		ArrayList<Rect> rl = new ArrayList<Rect>();
 
 		for (int i = 0; i < mer.length; i++) {
-			
-			//System.out.println(i+") "+mer[i]);
-			int[] cr = toCorners(mer[i], true); // TODO: REMOVE TRANSFORMS
-			
+
+			// System.out.println(i+") "+mer[i]);
+			Pt[] cr = toCorners(mer[i], true); // TODO: REMOVE TRANSFORMS?
+
 			boolean inside = false;
-			for (int j = 0; j < cr.length; j += 2) {
-				//System.out.println("Checking corner #"+(j/2)+" of MER#"+i+": "+cr[j]+","+cr[j + 1]);
-				if (bounds.contains(cr[j], cr[j + 1])) {
-					//System.out.println("Corner #"+(j/2)+" of MER#"+i+" inside ellipse");
+			for (int j = 0; j < cr.length; j++) {
+				// System.out.println("Checking corner #"+(j/2)+" of MER#"+i+": "+cr[j]+","+cr[j
+				// + 1]);
+				if (bounds.contains(cr[j].x, cr[j].y)) {
+					// System.out.println("Corner #"+(j/2)+" of MER#"+i+" inside ellipse");
 					inside = true;
 					break;
 				}
 			}
 			rl.add(mer[i]);
-			
-			if (!inside) {  // all four corners are outside our bounds
-				
-				if (i != 0)System.out.println("*** MER#" + i + " SPLITTING...");
+
+			if (!inside) { // all four corners are outside our bounds
+
+				if (i != 0)
+					System.out.println("*** MER#" + i + " SPLITTING...");
 				mer[i].width /= 2;
-				rl.add(new Rectangle(mer[i].x + mer[i].width, mer[i].y, mer[i].width, mer[i].height));
+				rl.add(new Rect(mer[i].x + mer[i].width, mer[i].y, mer[i].width, mer[i].height));
 			}
 		}
 
-		return rl.toArray(new Rectangle[0]);
+		return rl.toArray(new Rect[0]);
 	}
 
 	/* convert rect{x,y,w,h,} to 4 corner points */
-	public int[] toCorners(Rectangle b, boolean tf) {
+	public Pt[] toCorners(Rect bb, boolean tf) {
 
-		int tlX = b.x + (tf ? Math.round( (width - bounds.width)   / 2f) : 0);
-		int tlY = b.y + (tf ? Math.round( (height - bounds.height) / 2f) : 0);
-		int trX = tlX + b.width, trY = tlY;
-		int blX = tlX, blY = tlY + b.height;
-		int brX = tlX + b.width, brY = tlY + b.height;
-
-		return new int[] { tlX, tlY, trX, trY, brX, brY, blX, blY };
+		return !tf ? bb.toCorners() : bb.toCorners(
+				Math.round((width - bounds.width) / 2f),
+				Math.round((width - bounds.width) / 2f));
 	}
-	
+
 	public boolean complete() {
+
 		return steps >= rec.length;
 	}
 

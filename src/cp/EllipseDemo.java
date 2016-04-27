@@ -1,7 +1,5 @@
 package cp;
 
-import java.awt.Rectangle;
-
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
@@ -19,7 +17,7 @@ public class EllipseDemo extends ImgDemo {
 	public void drawPack(PGraphics p) {
 		
 		p.stroke(200);
-		Rectangle[] r = packer.rec;
+		Rect[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
 			p.fill(colors[i]);
 			p.rect(r[i].x, r[i].y, r[i].width, r[i].height);

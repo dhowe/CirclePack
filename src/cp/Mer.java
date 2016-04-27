@@ -1,8 +1,7 @@
 package cp;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class Mer {
 
@@ -19,10 +18,10 @@ public class Mer {
 		}
 	}
 	
-	public static Rectangle[] merToRects(int[][] mer) {
-		Rectangle[] r = new Rectangle[mer.length];
+	public static Rect[] merToRects(int[][] mer) {
+		Rect[] r = new Rect[mer.length];
 		for (int i = 0; i < mer.length; i++) {
-			r[i] = new Rectangle();
+			r[i] = new Rect();
 			r[i].x =  mer[i][1];
 			r[i].y =  mer[i][0];
 			r[i].width =  mer[i][3];
@@ -31,7 +30,7 @@ public class Mer {
 		return r;
 	}
 	
-	public static int[][] rectsToMer(Rectangle[] f, int tx, int ty) {
+	public static int[][] rectsToMer(Rect[] f, int tx, int ty) {
 
 		int[][] mer = new int[f.length][];
 		for (int i = 0; i < f.length; i++) {
@@ -44,7 +43,7 @@ public class Mer {
 		return mer;
 	}
 	
-	public static int[][] rectsToMer(Rectangle[] r) {
+	public static int[][] rectsToMer(Rect[] r) {
 		return rectsToMer(r, 0, 0);
 	}
 
@@ -58,7 +57,7 @@ public class Mer {
 	 */
 	public static int[][] MER(int rows, int cols, int[][] r, boolean print) {
 
-		List<int[]> results = new ArrayList<int[]>(); 
+		ArrayList<int[]> results = new ArrayList<int[]>(); 
 		char[][] matrix = new char[rows][cols];
 		setRect(matrix, vacant, 0, 0, rows, cols);
 

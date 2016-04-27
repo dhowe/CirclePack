@@ -1,7 +1,5 @@
 package cp;
 
-import java.awt.Rectangle;
-
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
@@ -17,7 +15,7 @@ public class RectDemo extends ImgDemo {
 		if (paused) advance();
 	}
 	
-	private Rectangle[] testset(int num) {
+	private Rect[] testset(int num) {
 		
 		colors = testSetColors(num);
 		return PU.testSetVariable(num);
@@ -26,7 +24,7 @@ public class RectDemo extends ImgDemo {
 	public void drawPack(PGraphics p) {
 		
 		p.stroke(200);
-		Rectangle[] r = packer.rec;
+		Rect[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
 			p.fill(colors[i]);
 			p.rect(r[i].x, r[i].y, r[i].width, r[i].height);
@@ -39,12 +37,12 @@ public class RectDemo extends ImgDemo {
 		
 		noStroke();
 		fill(0);
-		Rectangle[] r = packer.mer;
+		Rect[] r = packer.mer;
 		for (int i = 0; i < r.length; i++) {
-			 int[] cr = packer.toCorners(r[i], true);
-			 for (int j = 0; j < cr.length; j+=2) {
+			 Pt[] cr = packer.toCorners(r[i], true);
+			 for (int j = 0; j < cr.length; j++) {
 				 //System.out.println(cr[j]+","+cr[j+1]);
-				 ellipse(cr[j],cr[j+1],3,3);
+				 ellipse(cr[i].x,cr[i].y,3,3);
 			}
 		}
 	}

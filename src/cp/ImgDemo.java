@@ -1,8 +1,7 @@
 package cp;
 
-import java.awt.Rectangle;
-
-import processing.core.*;
+import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.event.MouseEvent;
 
 public class ImgDemo extends PApplet {
@@ -70,7 +69,7 @@ public class ImgDemo extends PApplet {
 		stroke(100);
 		translate(packer.bounds.x - Math.round(packer.bounds.width / 2f),
 					    packer.bounds.y - Math.round(packer.bounds.height / 2f));
-		Rectangle[] r = packer.mer;
+		Rect[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
 			noFill();

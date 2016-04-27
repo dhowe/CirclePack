@@ -4,7 +4,7 @@ import java.awt.*;
 
 import processing.core.PImage;
 
-public class IRect extends Rectangle {
+public class IRect extends Rect {
 
 	public PImage image;
 
