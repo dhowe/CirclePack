@@ -13,7 +13,7 @@ public class EllipticalArea extends PApplet {
 	}
 
 	public void setup() {
-		r = new Rectangle[5];
+		r = new Rectangle[15];
 		for (int i = 0; i < r.length; i++) {
 			r[i] = new Rectangle();
 			r[i].x = (int) random(300, 600);
@@ -39,30 +39,34 @@ public class EllipticalArea extends PApplet {
 		int cx = width / 2, cy = height / 2;
 		float ratio = 2f;
 		
-		Ellipse be = boundingEllipse(r, cx, cy, ratio);
-		Rectangle br = PU.alignedBoundingRect(r, cx, cy);
+		Ellipse e1 = PU.boundingEllipse(r, cx, cy, ratio);
+		float diam = PU.boundingCircle(r, cx, cy);
+		Ellipse e2 = new Ellipse(cx,cy,diam,diam);
+		float diam2 = PU.boundingCircleDiameterNew(r, cx, cy);
+		Ellipse e3 = new Ellipse(cx,cy,diam2,diam2);
+		Rectangle r1 = PU.alignedBoundingRect(r, cx, cy);
 
 		noFill();
 		stroke(0, 0, 200);
-		ellipse(be.x, be.y, be.width, be.height);
-
-		rect(br.x, br.y, br.width, br.height);
+		
+		drawEllipse(e1);
+		drawEllipse(e2);
+		//drawEllipse(e3);
+		rect(r1.x, r1.y, r1.width, r1.height);
 
 		fill(0);
 		noStroke();
 		ellipse(cx, cy, 5, 5);
 	}
 
-	static float SQRT2 = (float) Math.sqrt(2);
-	
-	static Ellipse boundingEllipse(Rectangle[] r, int cx, int cy, float ratio) {
-		Rectangle br = PU.alignedBoundingRect(r, cx, cy);
-
-		// float width' = sqrt(rect.width^2 + ratio^2 * rect.height^2)
-		float ew = sqrt( (br.width*br.width) + (ratio*ratio) * (br.height*br.height) );
-		float eh = ew / ratio;
+	public void drawEllipse(Ellipse e) {
 		
-		return new Ellipse(cx, cy, ew, eh);
+		ellipse(e.x, e.y, e.width, e.height);
+	}
+	
+	public void drawRect(Rectangle r) {
+		
+		rect(r.x, r.y, r.width, r.height);
 	}
 
 	public static void main(String[] args) {

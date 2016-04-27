@@ -67,9 +67,40 @@ public class PU {
 	static float boundingEllipseArea(Rectangle[] r, int cx, int cy, float ratio) {
 		return boundingEllipse(r, cx, cy, ratio).area();
 	}
-
-		
+	
+/* ArrayList <PVector> lineIntersectCircle(PVector a1, PVector a2, PVector c, float r) {
+	  ArrayList <PVector> points = new ArrayList <PVector> ();
+	  
+	  float a  = (a2.x - a1.x) * (a2.x - a1.x) + (a2.y - a1.y) * (a2.y - a1.y);
+	  float b  = 2 * ( (a2.x - a1.x) * (a1.x - c.x) + (a2.y - a1.y) * (a1.y - c.y)   );
+	  float cc = c.x*c.x + c.y*c.y + a1.x*a1.x + a1.y*a1.y - 2 * (c.x * a1.x + c.y * a1.y) - r*r;
+	  float d  = b*b - 4*a*cc;
+	  float e  = sqrt(d);
+	  float u1 = ( -b + e ) / ( 2*a );
+	  float u2 = ( -b - e ) / ( 2*a );
+	  
+	  if ( !( (u1 < 0 || u1 > 1) && (u2 < 0 || u2 > 1) ) ) {
+	    if ( 0 <= u1 && u1 <= 1) { points.add( new PVector( lerp(a1.x, a2.x, u1), lerp(a1.y, a2.y, u1) ) ); }
+	    if ( 0 <= u2 && u2 <= 1) { points.add( new PVector( lerp(a1.x, a2.x, u2), lerp(a1.y, a2.y, u2) ) ); }
+	  }
+	  
+	  return points;
+	}*/
+	
 	static Ellipse boundingEllipse(Rectangle[] r, int cx, int cy, float ratio) {
+		Rectangle br = PU.alignedBoundingRect(r, cx, cy);
+		float diam = PU.boundingCircle(r, cx, cy);
+		
+		// get intersection here
+
+		// ellipse.width = sqrt(rect.width^2 + ratio^2 * rect.height^2)
+		double ew = Math.sqrt( (br.width*br.width) + (ratio*ratio) * (br.height*br.height) );
+		double eh = ew / ratio;
+		
+		return new Ellipse(cx, cy, ew, eh);
+	}
+	
+	/*static Ellipse boundingEllipse(Rectangle[] r, int cx, int cy, float ratio) {
 
 		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
 				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
@@ -94,35 +125,35 @@ public class PU {
 		return new Ellipse(cx, cy, rx*2, ry*2);
 	}
 	
-//	static Ellipse boundingEllipseOrig(Rectangle[] r, int cx, int cy) {
-//
-//		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
-//				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
-//		
-//		for (int i = 0; i < r.length; i++) {
-//			minX = Math.min(minX, r[i].x);
-//			minY = Math.min(minY, r[i].y);
-//			maxX = Math.max(maxX, r[i].x + r[i].width);
-//			maxY = Math.max(maxY, r[i].y + r[i].height);
-//		}
-//		
-//		int rx = Math.round(Math.max(Math.abs(minX-cx), Math.abs(maxX-cx)));
-//		int ry = Math.round(Math.max(Math.abs(minY-cy), Math.abs(maxY-cy)));
-//		
-//		float ratio = 2;
-//		if (rx == ry * ratio)
-//			System.out.println("CORRECT");
-//		else if (rx > ry * ratio) {
-//			System.out.println("wider than ratio 2:1");
-//			ry = Math.round(rx / ratio);
-//		}
-//		else {
-//			System.out.println("taller than ratio 2:1");
-//			rx = Math.round(ry * ratio);
-//		}
-//		System.out.println("ratio:"+rx/ry);
-//		return new Ellipse(cx, cy, rx*2*SQRT2, ry*2*SQRT2);
-//	}
+	static Ellipse boundingEllipseOrig(Rectangle[] r, int cx, int cy) {
+
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, 
+				maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
+		
+		for (int i = 0; i < r.length; i++) {
+			minX = Math.min(minX, r[i].x);
+			minY = Math.min(minY, r[i].y);
+			maxX = Math.max(maxX, r[i].x + r[i].width);
+			maxY = Math.max(maxY, r[i].y + r[i].height);
+		}
+		
+		int rx = Math.round(Math.max(Math.abs(minX-cx), Math.abs(maxX-cx)));
+		int ry = Math.round(Math.max(Math.abs(minY-cy), Math.abs(maxY-cy)));
+		
+		float ratio = 2;
+		if (rx == ry * ratio)
+			System.out.println("CORRECT");
+		else if (rx > ry * ratio) {
+			System.out.println("wider than ratio 2:1");
+			ry = Math.round(rx / ratio);
+		}
+		else {
+			System.out.println("taller than ratio 2:1");
+			rx = Math.round(ry * ratio);
+		}
+		System.out.println("ratio:"+rx/ry);
+		return new Ellipse(cx, cy, rx*2*SQRT2, ry*2*SQRT2);
+	}*/
 	
 	static Rectangle alignedBoundingRect(Rectangle[] r, int cx, int cy) {
 
@@ -157,12 +188,13 @@ public class PU {
 		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
 	}
 
-	static float boundingCircleDiameter(Rectangle[] r, int cx, int cy) { 
+	static float boundingCircleDiameterNew(Rectangle[] r, int cx, int cy) { 
+		
 		Ellipse be = boundingEllipse(r, cx, cy);
 		return Math.max(be.width, be.height);
 	}
 	
-	static float boundingCircleOld(Rectangle[] r, int cx, int cy) { // not used
+	static float boundingCircle(Rectangle[] r, int cx, int cy) { // not used
 
 		float maxRadiusSoFar = 0;
 		for (int i = 0; i < r.length; i++) {

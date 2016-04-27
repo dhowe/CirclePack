@@ -13,7 +13,7 @@ public class RectDemo extends ImgDemo {
 
 		zoom = 1f;
 		packer = new Packer(testset(num), width, height);
-		packer.ratio = 2;
+		packer.ratio = 1;
 		if (paused) advance();
 	}
 	
