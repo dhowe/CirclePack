@@ -1,4 +1,4 @@
-package cp;
+package cp.util;
 
 import java.util.ArrayList;
 
@@ -78,7 +78,7 @@ public class Rect {
 		Pt[] corners = this.toCorners();
 		for (int i = 0; i < corners.length; i++) {
 			//System.out.println(corners[i]+" <-> "+corners[i%corners.length]);
-			PU.lineCircleIntersects(corners[i], corners[(i+1)%corners.length], c, radius, points);
+			Geom.lineCircleIntersects(corners[i], corners[(i+1)%corners.length], c, radius, points);
 		}
 		return points.toArray(new Pt[0]);
 	}

@@ -1,12 +1,18 @@
 package cp;
 
+import cp.util.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.event.MouseEvent;
 
-public class ImgDemo extends PApplet {
+public class ImagePacking extends PApplet {
 
-	final String OUTPUT = "/Users/dhowe/Desktop/rendered.png";
+	///////////////////////// Configuration ///////////////////////////////////
+	String INPUT_DIR = "/Users/dhowe/Desktop/AdCollage/759-ad-images";
+	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/";
+	String FOLDER_FILE = null ; //"cars.txt";
+	int TOTAL = 500;
+	/////////////////////////////////////////////////////////////////////////
 	
 	int ts, animateMs;
 	boolean paused = false;
@@ -16,8 +22,9 @@ public class ImgDemo extends PApplet {
 	IRect[] imgs;
 
 	public void init() {
-
-		imgs = PU.loadIRects("/Users/dhowe/Desktop/AdCrawl1", 150);
+		
+		String[] folders = FOLDER_FILE != null ?  loadStrings(FOLDER_FILE) : new String[0];
+		imgs = Load.loadIRects(INPUT_DIR, folders, TOTAL);
 		packer = new Packer(imgs, width, height);
 		if (paused)
 			advance();
@@ -30,11 +37,8 @@ public class ImgDemo extends PApplet {
 		if (!packer.complete())
 			drawNext(getGraphics());
 
-
-		// drawMouseCoords();
-
-		fill(100);
-		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
+		drawStatus();
+		
 		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
 		scale(zoom);
 
@@ -45,6 +49,15 @@ public class ImgDemo extends PApplet {
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
 		}
+	}
+
+	private void drawStatus() {
+
+		// drawMouseCoords();
+		fill(0);
+		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
+		int percent = (int)(packer.percent()*100);
+		text("status: "+(percent<100 ? percent+"%" : "done"), 10, 40);
 	}
 	
 	public void drawNext(PGraphics p) { /* no-op */ }
@@ -73,10 +86,10 @@ public class ImgDemo extends PApplet {
 		
 		stroke(0);
 		strokeWeight(3);
-		Rect rect = PU.alignedBoundingRect(packer.placed(), packer.bounds.x,packer.bounds.y);
+		Rect rect = Geom.alignedBoundingRect(packer.placed(), packer.bounds.x,packer.bounds.y);
 		P5.drawRect(this, rect);
 		
-		float diam = PU.boundingCircle(packer.placed(), packer.bounds.x,packer.bounds.y);
+		float diam = Geom.boundingCircle(packer.placed(), packer.bounds.x,packer.bounds.y);
 		ellipse(Math.round(width / 2f), Math.round(height / 2f),diam, diam);
 		
 		
@@ -141,7 +154,7 @@ public class ImgDemo extends PApplet {
 				advance();
 		} else if (key == 's') {
 			paused = true;
-			render(OUTPUT, packer.bounds.width, packer.bounds.height);
+			render(OUTPUT_DIR, packer.bounds.width, packer.bounds.height);
 		}
 		else if (keyCode == 38) {
 			paused = true;
@@ -167,8 +180,9 @@ public class ImgDemo extends PApplet {
 		return colors;
 	}
 
-	public void render(String name, float w, float h) {
-
+	public void render(String outDir, float w, float h) {
+		if (!outDir.endsWith("/")) outDir += "/";
+		String name = outDir + "AdRender_"+System.currentTimeMillis() + ".png";
 		PGraphics p = createGraphics((int)w, (int)h);
 		p.beginDraw();
 		p.background(255);
@@ -193,6 +207,6 @@ public class ImgDemo extends PApplet {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { ImgDemo.class.getName() });
+		PApplet.main(new String[] { ImagePacking.class.getName() });
 	}
 }

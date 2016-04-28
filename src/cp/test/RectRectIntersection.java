@@ -1,5 +1,7 @@
-package cp;
+package cp.test;
 
+import cp.util.P5;
+import cp.util.Rect;
 import processing.core.PApplet;
 
 public class RectRectIntersection extends PApplet {

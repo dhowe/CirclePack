@@ -2,6 +2,8 @@ package cp;
 
 import java.util.ArrayList;
 
+import cp.util.*;
+
 public class Packer {
 
 	Ellipse bounds;
@@ -24,7 +26,7 @@ public class Packer {
 	Rect[] computeMER() {
 
 		Rect[] sofar = placed();
-		bounds = PU.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
+		bounds = Geom.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
 
 		// translate packed rects from bounds.x/bounds.y to 0,0
 		int[][] imer = Mer.rectsToMer(sofar, 
@@ -94,8 +96,7 @@ public class Packer {
 
 			mer = computeMER();
 			
-			System.out.println(steps+") placed: "+curr.x+","+curr.y+" -> "+
-					PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio)+(steps>0?" in MER#"+bi+"."+bj:""));
+			//System.out.println(steps+") placed: "+curr.x+","+curr.y+" -> "+PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio)+(steps>0?" in MER#"+bi+"."+bj:""));
 			
 			++steps;
 		}
@@ -138,7 +139,7 @@ public class Packer {
 
 		place(curr, x, y);
 
-		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); 
+		float totalArea = Geom.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); 
 
 		return intersectsPack(curr) ? Float.MAX_VALUE : totalArea;
 	}
@@ -254,6 +255,12 @@ public class Packer {
 
 		return steps >= rec.length;
 	}
+	
+	public float percent() {
+
+		return steps / (float)rec.length;
+	}
+
 
 	public void reset() {
 		steps = 0;

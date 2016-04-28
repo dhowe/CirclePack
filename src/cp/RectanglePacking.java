@@ -1,9 +1,10 @@
 package cp;
 
+import cp.util.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class RectDemo extends ImgDemo {
+public class RectanglePacking extends ImagePacking {
 
 	int num = 200, colors[];
 
@@ -18,7 +19,7 @@ public class RectDemo extends ImgDemo {
 	private Rect[] testset(int num) {
 
 		colors = testSetColors(num);
-		return PU.testSetVariable(num);
+		return Geom.testSetVariable(num);
 	}
 
 	public void drawPack(PGraphics p) {
@@ -70,6 +71,6 @@ public class RectDemo extends ImgDemo {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { RectDemo.class.getName() });
+		PApplet.main(new String[] { RectanglePacking.class.getName() });
 	}
 }

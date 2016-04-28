@@ -1,4 +1,4 @@
-package cp;
+package cp.util;
 
 
 public class Ellipse {

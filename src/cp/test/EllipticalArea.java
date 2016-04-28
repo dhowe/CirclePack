@@ -1,5 +1,7 @@
-package cp;
+package cp.test;
 
+import cp.*;
+import cp.util.*;
 import processing.core.PApplet;
 
 public class EllipticalArea extends PApplet {
@@ -37,10 +39,10 @@ public class EllipticalArea extends PApplet {
 		int cx = width / 2, cy = height / 2;
 		float ratio = .5f;
 		
-		Rect boundingRect = PU.alignedBoundingRect(r, cx, cy);
-		Ellipse tightEllipse = PU.boundingEllipse(r, cx, cy, ratio);
+		Rect boundingRect = Geom.alignedBoundingRect(r, cx, cy);
+		Ellipse tightEllipse = Geom.boundingEllipse(r, cx, cy, ratio);
 		//Ellipse looseEllipse = PU.boundingEllipseLoose(r, cx, cy, ratio);
-		float diam = PU.boundingCircle(r, cx, cy);
+		float diam = Geom.boundingCircle(r, cx, cy);
 		//Ellipse boundingCirc = new Ellipse(cx,cy,diam,diam);
 
 		noFill();

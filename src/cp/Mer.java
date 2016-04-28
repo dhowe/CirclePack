@@ -2,6 +2,8 @@ package cp;
 
 import java.util.ArrayList;
 
+import cp.util.Rect;
+
 
 public class Mer {
 

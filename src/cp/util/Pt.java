@@ -1,4 +1,4 @@
-package cp;
+package cp.util;
 
 public class Pt {
 
@@ -39,7 +39,7 @@ public class Pt {
 
 	public float dist(int x2, int y2) {
 
-		 return PU.dist(x, y, x2, y2);
+		 return Geom.dist(x, y, x2, y2);
 	}
 
 }
