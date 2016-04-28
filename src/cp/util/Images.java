@@ -1,10 +1,20 @@
 package cp.util;
 
+import java.awt.Image;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-public class Load {
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+public class Images {
+
+	public static final String GIF_ONLY = "[^_].+\\.gif$";
+	public static final String ALL_TYPES = ".+\\.(png|gif|jpe?g)$";
+	public static boolean ANIMATED_ONLY = false;
+	public static String IMAGE_FILTER_RE = GIF_ONLY;
 
 	public static byte[] loadBytes(InputStream input) {
 		
@@ -73,40 +83,71 @@ public class Load {
 		return pl.toArray(new IRect[pl.size()]);
 	}
 
-	private static void createIRect(File ifs, List<IRect> result) {
+	private static void createIRect(File file, List<IRect> result) {
 
 		IRect pi = null;
 		try {
 
-			byte bytes[] = loadBytes(ifs);
+			byte bytes[] = loadBytes(file);
 			if (bytes == null)
-				throw new RuntimeException("NO BYTES FOR: " + ifs);
+				throw new RuntimeException("NO BYTES FOR: " + file);
 
-			pi = new IRect(new javax.swing.ImageIcon(bytes).getImage());
+			pi = new IRect(new javax.swing.ImageIcon(bytes).getImage(), file.getName());
+
 		} catch (Exception e) {
 
 			System.err.println("[WARN] " + e.getMessage());
 		}
 
-		if (pi != null)
-			result.add(pi);
+		if (pi == null) return;
+
+		result.add(pi);
 	}
 
+	public static boolean isAnimated(String file) {
+		return isAnimated(new File(file));
+	}
+		
+	public static boolean isAnimated(File file) {
+		
+		if (!file.getName().toLowerCase().endsWith(".gif"))
+			return false;
+			
+		ImageReader is = ImageIO.getImageReadersBySuffix("GIF").next();  
+    ImageInputStream iis = null;
+    try {
+        iis = ImageIO.createImageInputStream(file);
+        is.setInput(iis);  
+        return is.getNumImages(true) > 1 ? true : false;
+        
+    } catch (IOException e) {
+    	
+       System.err.println(e.getMessage());
+    }
+    finally {
+    	try {
+				if (iis!=null) iis.close();
+			} catch (IOException e) { }
+    }
+    
+    return false;
+	}
+	
 	public static boolean isImage(File file) {
 
-		return isImage(file.getName());
+		return isImage(file.getName(), IMAGE_FILTER_RE);
 	}
 
-	public static boolean isImage(Path path) {
+	public static boolean isImage(Path path, String regex) {
 
-		return isImage(path.toAbsolutePath().toString());
+		return isImage(path.toAbsolutePath().toString(), regex);
 	}
 
-	public static boolean isImage(String name) {
+	public static boolean isImage(String name, String regex) {
 
-		return name.matches(".+\\.(png|gif|jpe?g)$");
+		return name.matches(regex);
 	}
-
+	
 	public static File[] imageFiles(String dir, int maxNum) {
 
 		return imageFiles(dir, -1, maxNum);
@@ -154,7 +195,7 @@ public class Load {
 						break;
 
 					if (isImage(file) && count++ < maxPer) {
-						System.out.println("  adding(" + count + "/" + files.size() + ") -> " + file);
+						//System.out.println("  adding(" + count + "/" + files.size() + ") -> " + file);
 						files.add(file);
 					}
 
@@ -165,11 +206,20 @@ public class Load {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public static Image loadImage(String path) {
+		byte bytes[] = loadBytes(new File(path));
+		if (bytes == null)
+			throw new RuntimeException("NO BYTES FOR: " + path);
+		return new javax.swing.ImageIcon(bytes).getImage();
+	}
+	
 	public static void main(String[] args) {
 
-		// String[] files = imageNames("/Users/dhowe/Desktop/AdCrawl1");
-		File[] files = imageFiles("/Users/dhowe/Desktop/AdCrawl1");
-		System.out.println("Loaded " + files.length);
+		// String[] files = imageNames("/Users/dhowe/Desktop/AdCollage/AdCrawl1");
+		String fname = "/Users/dhowe/Desktop/AdCollage/testAni.gif";
+		//Image img = loadImage(fname);
+		System.out.println(isAnimated(new File(fname)));
+		//System.out.println("Loaded " + img);
 	}
 }

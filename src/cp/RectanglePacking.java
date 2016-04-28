@@ -13,12 +13,18 @@ public class RectanglePacking extends ImagePacking {
 		zoom = .5f;
 		paused = true;
 		packer = new Packer(testset(num), width, height);
-		if (paused) advance();
+		if (paused)
+			advance();
 	}
 
 	private Rect[] testset(int num) {
 
-		colors = testSetColors(num);
+		colors = new int[num];
+		for (int i = 0; i < colors.length; i++) {
+			float r = random(0, 150);
+			colors[i] = color(225 - r, random(0, r), 100 + r);
+		}
+
 		return Geom.testSetVariable(num);
 	}
 
@@ -41,7 +47,7 @@ public class RectanglePacking extends ImagePacking {
 		int ch = packer.rec[idx].height;
 		p.fill(colors[idx]);
 		p.rect(400, 400, cw, ch);
-		//if (packer.mer != null)p.rect(width/2, packer.mer[0].y, cw, ch);
+		// if (packer.mer != null)p.rect(width/2, packer.mer[0].y, cw, ch);
 		popMatrix();
 	}
 

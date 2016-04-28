@@ -9,25 +9,25 @@ public class ImagePacking extends PApplet {
 
 	///////////////////////// Configuration ///////////////////////////////////
 	String INPUT_DIR = "/Users/dhowe/Desktop/AdCollage/759-ad-images";
-	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/";
-	String FOLDER_FILE = null ; //"cars.txt";
-	int TOTAL = 500;
+	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
+	String FOLDER_FILE = null ; //"categories/cars.txt";
+	int TOTAL = 100;//200;
 	/////////////////////////////////////////////////////////////////////////
 	
 	int ts, animateMs;
 	boolean paused = false;
-	float zoom = .2f;
-
+	float panX, panY, zoom = .2f;
+	String mousedOver = "";
 	Packer packer;
 	IRect[] imgs;
 
 	public void init() {
 		
+		Images.IMAGE_FILTER_RE = Images.GIF_ONLY;
 		String[] folders = FOLDER_FILE != null ?  loadStrings(FOLDER_FILE) : new String[0];
-		imgs = Load.loadIRects(INPUT_DIR, folders, TOTAL);
+		imgs = Images.loadIRects(INPUT_DIR, folders, TOTAL);
 		packer = new Packer(imgs, width, height);
-		if (paused)
-			advance();
+		if (paused) advance();
 	}
 
 	public void draw() {
@@ -37,34 +37,54 @@ public class ImagePacking extends PApplet {
 		if (!packer.complete())
 			drawNext(getGraphics());
 
-		drawStatus();
+		drawInfo(true);
 		
-		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
+		panX = (1 - zoom) * width / 2;
+		panY = (1 - zoom) * height / 2;
+		translate(panX, panY);
 		scale(zoom);
 
 		//drawMer();
 		drawPack(getGraphics());
 		//drawBounds();
+		drawMouseOvers();
 
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
 		}
 	}
 
-	private void drawStatus() {
+	private void drawMouseOvers() {
+		mousedOver = "";
+		float mx = (mouseX-panX) / zoom;
+		float my = (mouseY-panY) / zoom;
+		for (int i = 0; i < packer.rec.length; i++) {
+			IRect ir = (IRect) packer.rec[i];
+			if (ir.contains(mx, my)) {
+				mousedOver = "image: "+ir.name;
+			}
+		}
+	}
+
+	private void drawInfo(boolean mouseOver) {
 
 		// drawMouseCoords();
 		fill(0);
 		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
 		int percent = (int)(packer.percent()*100);
-		text("status: "+(percent<100 ? percent+"%" : "done"), 10, 40);
+		text("zoom: "+zoom, 10, 40);
+		text("aspect: "+packer.ratio, 10, 60);
+		text("images: "+packer.rec.length, 10, 80);
+		text("status: "+(percent<100 ? percent+"%" : "done"), 10, 100);
+		text(mousedOver, 10, 120);		
 	}
 	
 	public void drawNext(PGraphics p) { /* no-op */ }
 
 	public void drawPack(PGraphics p) {
 
-		p.stroke(200);
+		
+		noStroke();
 		for (int i = 0; i < packer.rec.length; i++) {
 			IRect ir = (IRect) packer.rec[i];
 			p.image(ir.image, ir.x, ir.y, imgs[i].width, imgs[i].height);
@@ -123,8 +143,6 @@ public class ImagePacking extends PApplet {
 
 	public void advance(boolean forward) {
 
-		// if (!packer.complete()) System.out.println
-		// (packer.steps + ") " + (millis() - ts)+"ms");
 		if (forward)
 			packer.step();
 		else
@@ -169,18 +187,13 @@ public class ImagePacking extends PApplet {
 			zoom *= 1.2;
 		else if (e > 0 && zoom > .05)
 			zoom /= 1.2;
-	}
-
-	int[] testSetColors(int num) {
-		int[] colors = new int[num];
-		for (int i = 0; i < colors.length; i++) {
-			float r = random(0, 150);
-			colors[i] = color(225 - r, random(0, r), 100 + r);
-		}
-		return colors;
+		
+		zoom = min(zoom,1);
 	}
 
 	public void render(String outDir, float w, float h) {
+		
+		System.out.println("Rendering to a "+w+"x"+h+" canvas");
 		if (!outDir.endsWith("/")) outDir += "/";
 		String name = outDir + "AdRender_"+System.currentTimeMillis() + ".png";
 		PGraphics p = createGraphics((int)w, (int)h);
@@ -197,7 +210,7 @@ public class ImagePacking extends PApplet {
 	}
 
 	public void settings() {
-		size(2000, 1300);
+		size(2000, 1000);
 	}
 
 	public void setup() {
