@@ -16,6 +16,11 @@ public class Rect {
 		this(Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0);
 	}
 
+	// expects top-left and bottom-right corners
+	public static Rect fromCorners(Pt a, Pt b) {
+		return new Rect(a.x,a.y,b.x-a.x,b.y-a.y);
+	}
+	
 	public Rect(int x, int y, int width, int height) {
 
 		this.x = x;

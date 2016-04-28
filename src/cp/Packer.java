@@ -61,7 +61,9 @@ public class Packer {
 			}
 
 			mer = computeMER();
-			// System.out.println(steps+") placed: "+curr.x+","+curr.y);
+			
+			System.out.println(steps+") placed: "+curr.x+","+curr.y);
+			
 			++steps;
 		}
 
@@ -98,8 +100,7 @@ public class Packer {
 		place(curr, x, y);
 
 		// WORKING HERE
-		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); // fitness
-																																										// function
+		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); 
 
 		return intersectsPack(curr) ? Float.MAX_VALUE : totalArea;
 	}
@@ -166,9 +167,7 @@ public class Packer {
 		int[][] imer = Mer.rectsToMer(sofar, -bounds.x + Math.round(bounds.width / 2f),
 				-bounds.y + Math.round(bounds.height / 2f));
 
-		int rbw = Math.round(bounds.width);
-		int rbh = Math.round(bounds.height);
-		imer = Mer.MER(rbh, rbw, imer);
+		imer = Mer.MER(Math.round(bounds.height), Math.round(bounds.width), imer);
 
 		Rect[] result = Mer.merToRects(imer);
 
@@ -203,8 +202,8 @@ public class Packer {
 
 			if (!inside) { // all four corners are outside our bounds
 
-				if (i != 0)
-					System.out.println("*** MER#" + i + " SPLITTING...");
+				if (i != 0) continue; // Only the first ?
+				//System.out.println("*** MER#" + i + " SPLITTING...");
 				mer[i].width /= 2;
 				rl.add(new Rect(mer[i].x + mer[i].width, mer[i].y, mer[i].width, mer[i].height));
 			}

@@ -29,7 +29,7 @@ public class ImgDemo extends PApplet {
 		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
 		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
 		scale(zoom);
-
+		
 		drawMer();
 		drawPack(getGraphics());
 		drawBounds();
@@ -38,6 +38,8 @@ public class ImgDemo extends PApplet {
 			advance();
 		}
 	}
+
+	public void drawNext(PGraphics p) { /* no-op */	}
 
 	public void drawPack(PGraphics p) {
 
@@ -111,7 +113,8 @@ public class ImgDemo extends PApplet {
 				advance();
 		} else if (key == 's') {
 			paused = true;
-			render("/Users/dhowe/Desktop/rendered.png", packer.bounds.width, packer.bounds.height);
+			render("/Users/dhowe/Desktop/rendered.png", 
+					packer.bounds.width, packer.bounds.height);
 		} 
 	}
 

@@ -1,7 +1,5 @@
 package cp;
 
-import java.util.Arrays;
-
 import processing.core.PApplet;
 
 public class EllipticalArea extends PApplet {
@@ -37,35 +35,47 @@ public class EllipticalArea extends PApplet {
 		}
 
 		int cx = width / 2, cy = height / 2;
-		float ratio = 2f;
+		float ratio = .5f;
 		
-		//Ellipse e1 = PU.boundingEllipse(r, cx, cy, ratio);
+		Rect boundingRect = PU.alignedBoundingRect(r, cx, cy);
+		Ellipse tightEllipse = PU.boundingEllipse(r, cx, cy, ratio);
+		Ellipse looseEllipse = PU.boundingEllipseLoose(r, cx, cy, ratio);
 		float diam = PU.boundingCircle(r, cx, cy);
-		Ellipse e2 = new Ellipse(cx,cy,diam,diam);
-		//float diam2 = PU.boundingCircleDiameterNew(r, cx, cy);
-		//Ellipse e3 = new Ellipse(cx,cy,diam2,diam2);
-		Rect r1 = PU.alignedBoundingRect(r, cx, cy);
+		Ellipse boundingCirc = new Ellipse(cx,cy,diam,diam);
 
 		noFill();
 		stroke(0, 0, 200);
 		
-		//drawEllipse(e1);
-		drawEllipse(e2);
-		//drawEllipse(e3);
-		rect(r1.x, r1.y, r1.width, r1.height);
+		drawEllipse(tightEllipse);
+		drawEllipse(looseEllipse);
+		//drawCircle(boundingCirc);
+		//drawRect(boundingRect);
 
 		fill(0);
 		noStroke();
 		ellipse(cx, cy, 5, 5);
 		
 		
-		/*Pt[] pts = r1.intersectsCircle(cx, cy, diam/2f);
-		System.out.println(Arrays.asList(pts));
-		for (int i = 0; i < pts.length; i++) {
-			ellipse(pts[i].x, pts[i].y, 5, 5);
-		}*/
+		Pt[] p = boundingRect.intersectsCircle(cx, cy, diam/2f);
+		for (int i = 0; i < p.length; i++) {
+			text(i,p[i].x, p[i].y);
+			ellipse(p[i].x, p[i].y, 5, 5);
+		}
 		
-		PU.lineCircleIntersects(new Pt(), new Pt(), new Pt(cx, cy), diam/2f);
+		Rect minRect;
+		if (p.length == 8) {
+			noFill();
+			stroke(200,0,50);
+			if (ratio>1)
+				minRect = Rect.fromCorners(p[0],p[4]);
+			else
+				minRect = Rect.fromCorners(p[7],p[3]);
+			drawRect(minRect);
+		}
+	}
+
+	private void drawCircle(Ellipse e) {
+		ellipse(e.x, e.y, e.width, e.height);
 	}
 
 	public void drawEllipse(Ellipse e) {
