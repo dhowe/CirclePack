@@ -85,14 +85,14 @@ public class PU {
 	static final float lerp(float start, float stop, float amt) {
 		return start + (stop - start) * amt;
 	}
+//
+//	static Ellipse boundingEllipse(Rect[] r, int cx, int cy) {
+//		return boundingEllipse(r, cx, cy, 1);
+//	}
 
-	static Ellipse boundingEllipse(Rect[] r, int cx, int cy) {
-		return boundingEllipse(r, cx, cy, 1);
-	}
-
-	static float boundingEllipseArea(Rect[] r, int cx, int cy) {
-		return boundingEllipseArea(r, cx, cy, 1);
-	}
+//	static float boundingEllipseArea(Rect[] r, int cx, int cy) {
+//		return boundingEllipseArea(r, cx, cy, 1);
+//	}
 
 	static float boundingEllipseArea(Rect[] r, int cx, int cy, float ratio) {
 		return boundingEllipse(r, cx, cy, ratio).area();
@@ -157,12 +157,12 @@ public class PU {
 
 		return new Rect(minX, minY, maxX - minX, maxY - minY);
 	}
-
-	static float boundingCircleDiameterNew(Rect[] r, int cx, int cy) {
-
-		Ellipse be = boundingEllipse(r, cx, cy);
-		return Math.max(be.width, be.height);
-	}
+//
+//	static float boundingCircleDiameterNew(Rect[] r, int cx, int cy) {
+//
+//		Ellipse be = boundingEllipse(r, cx, cy);
+//		return Math.max(be.width, be.height);
+//	}
 
 	static float boundingCircle(Rect[] r, int cx, int cy) { // not used
 

@@ -5,12 +5,13 @@ import processing.core.PGraphics;
 
 public class RectDemo extends ImgDemo {
 
-	int num = 100, colors[];
+	int num = 200, colors[];
 
 	public void init() {
 
 		zoom = .5f;
-		packer = new Packer(testset(num), width, height / 2);
+		paused = true;
+		packer = new Packer(testset(num), width, height);
 		if (paused) advance();
 	}
 
@@ -21,7 +22,6 @@ public class RectDemo extends ImgDemo {
 	}
 
 	public void drawPack(PGraphics p) {
-		drawNext(p);
 		p.stroke(200);
 		Rect[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
@@ -33,13 +33,15 @@ public class RectDemo extends ImgDemo {
 	}
 
 	public void drawNext(PGraphics p) {
-
+		pushMatrix();
+		scale(zoom);
 		int idx = packer.steps % packer.rec.length;
 		int cw = packer.rec[idx].width;
 		int ch = packer.rec[idx].height;
 		p.fill(colors[idx]);
-		p.rect(100, height/2 - packer.bounds.height-100, cw, ch);
+		p.rect(400, 400, cw, ch);
 		//if (packer.mer != null)p.rect(width/2, packer.mer[0].y, cw, ch);
+		popMatrix();
 	}
 
 	public void merCorners(PGraphics p) {

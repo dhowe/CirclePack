@@ -39,17 +39,17 @@ public class EllipticalArea extends PApplet {
 		
 		Rect boundingRect = PU.alignedBoundingRect(r, cx, cy);
 		Ellipse tightEllipse = PU.boundingEllipse(r, cx, cy, ratio);
-		Ellipse looseEllipse = PU.boundingEllipseLoose(r, cx, cy, ratio);
+		//Ellipse looseEllipse = PU.boundingEllipseLoose(r, cx, cy, ratio);
 		float diam = PU.boundingCircle(r, cx, cy);
-		Ellipse boundingCirc = new Ellipse(cx,cy,diam,diam);
+		//Ellipse boundingCirc = new Ellipse(cx,cy,diam,diam);
 
 		noFill();
 		stroke(0, 0, 200);
 		
-		drawEllipse(tightEllipse);
-		drawEllipse(looseEllipse);
+		//drawEllipse(tightEllipse);
+		//drawEllipse(looseEllipse);
 		//drawCircle(boundingCirc);
-		//drawRect(boundingRect);
+		drawRect(boundingRect);
 
 		fill(0);
 		noStroke();
@@ -70,7 +70,7 @@ public class EllipticalArea extends PApplet {
 				minRect = Rect.fromCorners(p[0],p[4]);
 			else
 				minRect = Rect.fromCorners(p[7],p[3]);
-			drawRect(minRect);
+			//drawRect(minRect);
 		}
 	}
 

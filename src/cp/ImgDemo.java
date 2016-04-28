@@ -6,7 +6,9 @@ import processing.event.MouseEvent;
 
 public class ImgDemo extends PApplet {
 
-	int ts, animateMs = 10;
+	final String OUTPUT = "/Users/dhowe/Desktop/rendered.png";
+	
+	int ts, animateMs;
 	boolean paused = false;
 	float zoom = .2f;
 
@@ -15,31 +17,37 @@ public class ImgDemo extends PApplet {
 
 	public void init() {
 
-		imgs = PU.loadIRects("/Users/dhowe/Desktop/AdCrawl1",150);
+		imgs = PU.loadIRects("/Users/dhowe/Desktop/AdCrawl1", 150);
 		packer = new Packer(imgs, width, height);
-		if (paused) advance();
+		if (paused)
+			advance();
 	}
 
 	public void draw() {
 
 		background(255);
-		//drawMouseCoords();
-		
+
+		if (!packer.complete())
+			drawNext(getGraphics());
+
+
+		// drawMouseCoords();
+
 		fill(100);
 		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
 		translate((1 - zoom) * width / 2, (1 - zoom) * height / 2);
 		scale(zoom);
-		
-		drawMer();
+
+		//drawMer();
 		drawPack(getGraphics());
-		drawBounds();
+		//drawBounds();
 
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
 		}
 	}
-
-	public void drawNext(PGraphics p) { /* no-op */	}
+	
+	public void drawNext(PGraphics p) { /* no-op */ }
 
 	public void drawPack(PGraphics p) {
 
@@ -53,16 +61,28 @@ public class ImgDemo extends PApplet {
 	void drawMouseCoords() {
 
 		fill(0);
-		text(zoom == 1 ? Integer.toString(mouseX) + "," +
-				Integer.toString(mouseY) : "z="+zoom, 10, 30);
+		text(zoom == 1 ? Integer.toString(mouseX) + "," + Integer.toString(mouseY) : "z=" + zoom, 10, 30);
 	}
 
 	void drawBounds() {
 
 		noFill();
 		stroke(255, 0, 255);
-		ellipse(packer.bounds.x, packer.bounds.y, packer.bounds.width, packer.bounds.height);
+		
+		P5.drawEllipse(this, packer.bounds);
+		
+		stroke(0);
+		strokeWeight(3);
+		Rect rect = PU.alignedBoundingRect(packer.placed(), packer.bounds.x,packer.bounds.y);
+		P5.drawRect(this, rect);
+		
+		float diam = PU.boundingCircle(packer.placed(), packer.bounds.x,packer.bounds.y);
+		ellipse(Math.round(width / 2f), Math.round(height / 2f),diam, diam);
+		
+		
+		strokeWeight(1);
 		stroke(0, 155, 155);
+		ellipse(Math.round(width / 2f), Math.round(height / 2f),5,5);
 	}
 
 	void drawMer() {
@@ -70,29 +90,37 @@ public class ImgDemo extends PApplet {
 		pushMatrix();
 		stroke(100);
 		translate(packer.bounds.x - Math.round(packer.bounds.width / 2f),
-					    packer.bounds.y - Math.round(packer.bounds.height / 2f));
+				packer.bounds.y - Math.round(packer.bounds.height / 2f));
 		Rect[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
 			noFill();
 			rect(r[i].x, r[i].y, r[i].width, r[i].height);
 			fill(0);
-			//text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
-			//text((char) (i + 65), r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
+			text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
+			// text((char) (i + 65), r[i].x + r[i].width / 2, r[i].y + r[i].height /
+			// 2);
 		}
 		popMatrix();
 	}
 
 	public void advance() {
+		advance(true);
+	}
 
-		//if (!packer.complete()) System.out.println
+	public void advance(boolean forward) {
+
+		// if (!packer.complete()) System.out.println
 		// (packer.steps + ") " + (millis() - ts)+"ms");
-		packer.step();
+		if (forward)
+			packer.step();
+		else
+			packer.back();
 		ts = millis();
 	}
 
 	public void keyPressed() {
-
+		//System.out.println(key+" "+keyCode);
 		if (key == ' ') {
 			if (paused)
 				advance();
@@ -113,9 +141,12 @@ public class ImgDemo extends PApplet {
 				advance();
 		} else if (key == 's') {
 			paused = true;
-			render("/Users/dhowe/Desktop/rendered.png", 
-					packer.bounds.width, packer.bounds.height);
-		} 
+			render(OUTPUT, packer.bounds.width, packer.bounds.height);
+		}
+		else if (keyCode == 38) {
+			paused = true;
+			advance(false);
+		}
 	}
 
 	public void mouseWheel(MouseEvent event) {
@@ -138,7 +169,7 @@ public class ImgDemo extends PApplet {
 
 	public void render(String name, float w, float h) {
 
-		PGraphics p = createGraphics((int) (w * 1.2), (int) h);
+		PGraphics p = createGraphics((int)w, (int)h);
 		p.beginDraw();
 		p.background(255);
 		p.translate((p.width - width) / 2f, (p.height - height) / 2f);
@@ -156,7 +187,7 @@ public class ImgDemo extends PApplet {
 	}
 
 	public void setup() {
-		surface.setLocation(800, 0);
+		surface.setLocation(1200, 0);
 		init();
 	}
 

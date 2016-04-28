@@ -108,12 +108,14 @@ public class Rect {
 		return ((w < x || w > X) && (h < y || h > Y));
 	}
 
-	public Rect intersection(Rect r) { // not used
+	// if no intersection, returns a rect with width=0 and height=0
+	public Rect intersection(Rect r) {
 
 		int tx1 = this.x;
 		int ty1 = this.y;
 		int rx1 = r.x;
 		int ry1 = r.y;
+		
 		long tx2 = tx1;
 		tx2 += this.width;
 		long ty2 = ty1;
@@ -122,6 +124,7 @@ public class Rect {
 		rx2 += r.width;
 		long ry2 = ry1;
 		ry2 += r.height;
+		
 		if (tx1 < rx1)
 			tx1 = rx1;
 		if (ty1 < ry1)
@@ -130,20 +133,31 @@ public class Rect {
 			tx2 = rx2;
 		if (ty2 > ry2)
 			ty2 = ry2;
+
 		tx2 -= tx1;
 		ty2 -= ty1;
-		// tx2,ty2 will never overflow (they will never be
-		// larger than the smallest of the two source w,h)
-		// they might underflow, though...
+
 		if (tx2 < Integer.MIN_VALUE)
 			tx2 = Integer.MIN_VALUE;
 		if (ty2 < Integer.MIN_VALUE)
 			ty2 = Integer.MIN_VALUE;
 		
-		return new Rect(tx1, ty1, (int) tx2, (int) ty2);
+		float w = Math.round(tx2), h = Math.round(ty2);
+		
+		return (w > 0 && h > 0) ? new Rect(tx1, ty1, w, h) : new Rect(tx1, ty1, 0, 0);
 	}
 
+	public Pt center() {
+		
+		return new Pt(x+width/2,y+height/2);
+	}
+	
 	public boolean intersects(Rect r) {
+		
+		return intersection(r).width > 0;
+	}
+	
+	public boolean intersects2(Rect r) {
 
 		int tw = this.width;
 		int th = this.height;
@@ -152,6 +166,7 @@ public class Rect {
 		if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) {
 			return false;
 		}
+		
 		int tx = this.x;
 		int ty = this.y;
 		int rx = r.x;
@@ -160,10 +175,17 @@ public class Rect {
 		rh += ry;
 		tw += tx;
 		th += ty;
+		
 		// overflow || intersect
 		return ((rw < rx || rw > tx) && (rh < ry || rh > ty) && (tw < tx || tw > rx) && (th < ty || th > ry));
 	}
+	
+	@Override
+	public String toString() {
 
+		return "[" + x + ", " + y + ", " + width + ", " + height + "]";
+	}
+	
 	public static void main(String[] args) {
 
 		System.out.println(new Rect(0, 0, 12, 4).area() / Math.PI); // ~12

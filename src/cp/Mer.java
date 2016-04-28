@@ -5,9 +5,7 @@ import java.util.ArrayList;
 
 public class Mer {
 
-	public static char occuppied = '#';
-	public static char vacant = '-';
-	public static char mark = 'A';
+	public static char occuppied = '#', vacant = '-', mark = 'A';
 
 	public static void main(String[] args) {
 		int[][] r = {{ 2,3,2,2 }, {5,5,2,6}};

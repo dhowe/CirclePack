@@ -2,7 +2,7 @@ package cp;
 
 import processing.core.PApplet;
 
-public class IntersectTests extends PApplet {
+public class RectCircleIntersects extends PApplet {
 
 	public void setup() {
 		
@@ -33,6 +33,6 @@ public class IntersectTests extends PApplet {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { IntersectTests.class.getName() });
+		PApplet.main(new String[] { RectCircleIntersects.class.getName() });
 	}
 }

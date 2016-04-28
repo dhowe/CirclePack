@@ -1,6 +1,5 @@
 package cp;
 
-import java.util.ArrayList;
 
 public class Ellipse {
 
@@ -36,7 +35,13 @@ public class Ellipse {
 
 		this(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
 	}
+	
+	@Override
+	public String toString() {
 
+		return "[" + x + ", " + y + ", " + width + ", " + height + "]";
+	}
+	
 	public float area() {
 
 		return (float) (Math.PI * (width / 2d) * (height / 2d));

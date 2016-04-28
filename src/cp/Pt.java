@@ -12,6 +12,7 @@ public class Pt {
 	public Pt(int x, int y) {
 
 		this.x = x;
+		
 		this.y = y;
 	}
 
@@ -24,16 +25,21 @@ public class Pt {
 
 		this(Math.round(x), Math.round(y));
 	}
-	
+
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return "["+x+", "+y+"]";
+
+		return "[" + x + ", " + y + "]";
 	}
 
 	public static void main(String[] args) {
 
 		System.out.println(new Pt(12, 4));
+	}
+
+	public float dist(int x2, int y2) {
+
+		 return PU.dist(x, y, x2, y2);
 	}
 
 }

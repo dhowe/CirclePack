@@ -7,7 +7,7 @@ public class Packer {
 	Ellipse bounds;
 	Rect[] mer, rec;
 	float ratio, width, height;
-	int steps;
+	int steps, maxOverlapArea = 300;
 
 	public Packer(Rect[] r, float cw, float ch) {
 
@@ -20,40 +20,72 @@ public class Packer {
 		// sortByMaxEdge(r);
 		sortByArea(r);
 	}
+	
+	Rect[] computeMER() {
 
+		Rect[] sofar = placed();
+		bounds = PU.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
+
+		// translate packed rects from bounds.x/bounds.y to 0,0
+		int[][] imer = Mer.rectsToMer(sofar, 
+				-bounds.x + Math.round(bounds.width / 2f),
+				-bounds.y + Math.round(bounds.height / 2f));
+
+		imer = Mer.MER(Math.round(bounds.height), Math.round(bounds.width), imer);
+
+		Rect[] result = Mer.merToRects(imer);
+		
+    /*for (int i = 0; i < result.length; i++)
+			System.out.println("M"+i+") "+result[i].x+","+result[i].y+" "+result[i].width+"x"+result[i].height);
+		System.out.println();*/
+		return validateMer(result);
+	}
+	
 	public int step() {
 
 		// System.out.println("STEP #"+steps);
 		if (steps < rec.length) {
 
 			Rect curr = rec[steps];
+			
+			int bi=-1, bj=-1;
+			
 			if (steps > 0) {
 
-				float bestMaxCornerDist = Float.MAX_VALUE;
-				float bestMaxCenterDist = Float.MAX_VALUE;
+				float bestEllipseArea = Float.MAX_VALUE;
+				float bestCenterDist = Float.MAX_VALUE;
 
-				for (int i = 0; i < mer.length; i++) {
-
+				boolean dbug = false;
+				for (int i = mer.length-1; i>=0; i--) {
+					
+					dbug = (false && i == 0);
+					if(dbug)System.out.println("MER#"+i);
+					
 					for (int j = 0; j < 4; j++) {
 
 						int px = curr.x, py = curr.y;
-						float dia = testPlacement(curr, mer[i], j);
+						float ellipseArea = testPlacement(curr, mer[i], j);
+						
+						if(dbug)System.out.println("  "+j+" = "+(ellipseArea==Float.MAX_VALUE ? "FAIL" : ellipseArea));
+						
+						if (ellipseArea < bestEllipseArea) {
 
-						if (dia < bestMaxCornerDist) {
+							bi = i; bj = j;
+							bestEllipseArea = ellipseArea;
+							bestCenterDist = centerPointDist(curr);
 
-							bestMaxCornerDist = dia;
-							bestMaxCenterDist = centerPointDist(curr);
+						} else if (ellipseArea == bestEllipseArea && centerPointDist(curr) < bestCenterDist) {
 
-						} else if (dia == bestMaxCornerDist && centerPointDist(curr) < bestMaxCenterDist) {
-
-							bestMaxCornerDist = dia;
-							bestMaxCenterDist = centerPointDist(curr);
+							bi = i; bj = j;
+							bestEllipseArea = ellipseArea;
+							bestCenterDist = centerPointDist(curr);
 
 						} else {
 
 							place(curr, px, py); // revert
 						}
 					}
+					if(dbug)System.out.println();
 				}
 			} else {
 
@@ -62,13 +94,20 @@ public class Packer {
 
 			mer = computeMER();
 			
-			System.out.println(steps+") placed: "+curr.x+","+curr.y);
+			System.out.println(steps+") placed: "+curr.x+","+curr.y+" -> "+
+					PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio)+(steps>0?" in MER#"+bi+"."+bj:""));
 			
 			++steps;
 		}
 
 		return steps;
 	}
+	
+	public void back() {		
+		rec[--steps].x = Integer.MAX_VALUE;
+		mer = computeMER();
+	}
+
 
 	float testPlacement(Rect curr, Rect mer, int type) {
 
@@ -99,7 +138,6 @@ public class Packer {
 
 		place(curr, x, y);
 
-		// WORKING HERE
 		float totalArea = PU.boundingEllipseArea(placed(), bounds.x, bounds.y, ratio); 
 
 		return intersectsPack(curr) ? Float.MAX_VALUE : totalArea;
@@ -108,9 +146,8 @@ public class Packer {
 	// Dist from center point of rect to center point of pack
 	float centerPointDist(Rect r) {
 
-		int rx = r.x + Math.round(r.width / 2f);
-		int ry = r.y + Math.round(r.height / 2f);
-		return PU.dist(rx, ry, bounds.x, bounds.y);
+		Pt center = r.center();
+		return center.dist(bounds.x, bounds.y);
 	}
 
 	void sortByArea(Rect[] r) {
@@ -132,8 +169,17 @@ public class Packer {
 	boolean intersectsPack(Rect curr) {
 		Rect[] pack = placed();
 		for (int i = 0; i < pack.length; i++) {
-			if (curr != pack[i] && curr.intersects(pack[i]))
-				return true;
+			if (curr != pack[i]) {
+				float intersectionArea = curr.intersection(pack[i]).area();
+				
+				// TODO: this should be relative to the size
+				float slop = Math.min(curr.area(),pack[i].area()) / 50f;
+				if (intersectionArea > slop) {
+					
+					//System.out.println("PACK-INTERSECT R#"+i+" area="+intersectionArea+" "+curr+" "+pack[i]);
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -156,22 +202,6 @@ public class Packer {
 				p.add(rec[i]);
 		}
 		return p.toArray(new Rect[0]);
-	}
-
-	Rect[] computeMER() {
-
-		Rect[] sofar = placed();
-		bounds = PU.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
-
-		// translate packed rects from bounds.x/bounds.y to 0,0
-		int[][] imer = Mer.rectsToMer(sofar, -bounds.x + Math.round(bounds.width / 2f),
-				-bounds.y + Math.round(bounds.height / 2f));
-
-		imer = Mer.MER(Math.round(bounds.height), Math.round(bounds.width), imer);
-
-		Rect[] result = Mer.merToRects(imer);
-
-		return validateMer(result);
 	}
 
 	/*
@@ -232,5 +262,6 @@ public class Packer {
 			rec[i].x = Integer.MAX_VALUE;
 		}
 	}
+
 
 }
