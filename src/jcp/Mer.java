@@ -1,8 +1,8 @@
-package cp;
+package jcp;
 
 import java.util.ArrayList;
 
-import cp.util.Rect;
+import jcp.util.Rect;
 
 
 public class Mer {

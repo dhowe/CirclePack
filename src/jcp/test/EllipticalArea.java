@@ -1,7 +1,7 @@
-package cp.test;
+package jcp.test;
 
-import cp.*;
-import cp.util.*;
+import jcp.*;
+import jcp.util.*;
 import processing.core.PApplet;
 
 public class EllipticalArea extends PApplet {

@@ -1,6 +1,6 @@
-package cp;
+package jcp;
 
-import cp.util.*;
+import jcp.util.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 

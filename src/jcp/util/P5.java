@@ -1,4 +1,4 @@
-package cp.util;
+package jcp.util;
 
 import processing.core.PApplet;
 

@@ -1,8 +1,8 @@
-package cp;
+package jcp;
 
 import java.util.ArrayList;
 
-import cp.util.*;
+import jcp.util.*;
 
 public class Packer {
 

@@ -1,7 +1,7 @@
-package cp.test;
+package jcp.test;
 
-import cp.util.Pt;
-import cp.util.Rect;
+import jcp.util.Pt;
+import jcp.util.Rect;
 import processing.core.PApplet;
 
 public class RectCircleIntersects extends PApplet {

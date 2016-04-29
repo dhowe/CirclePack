@@ -1,20 +1,19 @@
-package cp.util;
+package circle;
 
 import java.awt.*;
 
 import processing.core.PImage;
 
-public class IRect extends Rect {
+public class CIRect extends Rectangle {
 
 	public PImage image;
 	public String name;
-	public boolean animated;
 
-	public IRect(Image i, String name) {
+	public CIRect(Image i, String name) {
 		this(new PImage(i), name);
 	}
 	
-	public IRect(PImage p, String name) {
+	public CIRect(PImage p, String name) {
 		this.image = p;
 		this.name = name;
 		this.x = Integer.MAX_VALUE;
