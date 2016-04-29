@@ -11,7 +11,7 @@ public class ImagePacking extends PApplet {
 	String INPUT_DIR = "/Users/dhowe/Desktop/AdCollage/759-ad-images";
 	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
 	String FOLDER_FILE = null ; //"categories/cars.txt";
-	int TOTAL = 100;//200;
+	int TOTAL = -1;//200;
 	/////////////////////////////////////////////////////////////////////////
 	
 	int ts, animateMs;
@@ -23,7 +23,6 @@ public class ImagePacking extends PApplet {
 
 	public void init() {
 		
-		Images.IMAGE_FILTER_RE = Images.GIF_ONLY;
 		String[] folders = FOLDER_FILE != null ?  loadStrings(FOLDER_FILE) : new String[0];
 		imgs = Images.loadIRects(INPUT_DIR, folders, TOTAL);
 		packer = new Packer(imgs, width, height);

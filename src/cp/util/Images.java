@@ -12,9 +12,8 @@ import javax.imageio.stream.ImageInputStream;
 public class Images {
 
 	public static final String GIF_ONLY = "[^_].+\\.gif$";
-	public static final String ALL_TYPES = ".+\\.(png|gif|jpe?g)$";
-	public static boolean ANIMATED_ONLY = false;
-	public static String IMAGE_FILTER_RE = GIF_ONLY;
+	public static final String ALL_TYPES = "[^_].+\\.(png|gif|jpe?g)$";
+	public static String IMAGE_FILTER_RE = ALL_TYPES;
 
 	public static byte[] loadBytes(InputStream input) {
 		
