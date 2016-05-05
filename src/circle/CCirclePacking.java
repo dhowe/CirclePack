@@ -21,7 +21,7 @@ public class CCirclePacking extends PApplet {
 
 	public void init() {
 
-		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/Groups/Sexy");
+		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/AdsByBrand/Groups/HK");
 		packer = new CPacker(imgs, width, height);
 		if (paused)
 			advance();
@@ -41,7 +41,7 @@ public class CCirclePacking extends PApplet {
 		// drawMer();
 		drawPack(getGraphics());
 		drawBounds();
-		drawMouseOvers();
+		//drawMouseOvers();
 
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
@@ -68,7 +68,7 @@ public class CCirclePacking extends PApplet {
 		}
 	}
 	
-	private void drawMouseOvers() {
+	public void drawMouseOvers() {
 		
 		mousedOver = "";
 		float mx = (mouseX-panX) / zoom;
@@ -190,7 +190,7 @@ public class CCirclePacking extends PApplet {
 	}
 
 	public void settings() {
-		size(2000, 1300);
+		size(2400, 1300);
 	}
 
 	public void setup() {

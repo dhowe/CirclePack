@@ -1,10 +1,11 @@
-package jcp;
+package circle;
 
-import jcp.util.*;
+import java.awt.Rectangle;
+
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class RectanglePacking extends ImagePacking {
+public class CRectPacking extends CCirclePacking {
 
 	int num = 200, colors[];
 
@@ -12,27 +13,40 @@ public class RectanglePacking extends ImagePacking {
 
 		zoom = .5f;
 		paused = true;
-		packer = new Packer(testset(num), width, height);
+		packer = new CPacker(testset(num), width, height);
 		if (paused)
 			advance();
 	}
 	
-	public void drawMouseOvers() {}
-
-	private Rect[] testset(int num) {
-
+	private Rectangle[] testset(int num) {
+		
 		colors = new int[num];
 		for (int i = 0; i < colors.length; i++) {
 			float r = random(0, 150);
 			colors[i] = color(225 - r, random(0, r), 100 + r);
 		}
 
-		return Geom.testSetVariable(num);
-	}
+		Rectangle[] r = new Rectangle[num];
+		for (int i = 0; i < r.length; i++) {
+			int w = (int) (20 + Math.random() * 200);
+			int h = (int) (20 + Math.random() * 200);
 
+			if (Math.random() < .01) {
+				w = 300;
+				h = 600;
+			}
+			if (Math.random() < .02) {
+				w = 728;
+				h = 90;
+			}
+			r[i] = new Rectangle(Integer.MAX_VALUE, 0, w, h);
+		}
+		return r;
+	}
+	
 	public void drawPack(PGraphics p) {
 		p.stroke(200);
-		Rect[] r = packer.rec;
+		Rectangle[] r = packer.rec;
 		for (int i = 0; i < r.length; i++) {
 			p.fill(colors[i]);
 			p.rect(r[i].x, r[i].y, r[i].width, r[i].height);
@@ -53,23 +67,9 @@ public class RectanglePacking extends ImagePacking {
 		popMatrix();
 	}
 
-	public void merCorners(PGraphics p) {
-
-		noStroke();
-		fill(0);
-		Rect[] r = packer.mer;
-		for (int i = 0; i < r.length; i++) {
-			Pt[] cr = packer.toCorners(r[i], true);
-			for (int j = 0; j < cr.length; j++) {
-				// System.out.println(cr[j]+","+cr[j+1]);
-				ellipse(cr[i].x, cr[i].y, 3, 3);
-			}
-		}
-	}
-
 	public void keyPressed() {
 		if (key == 'g') {
-			packer = new Packer(testset(num), packer.width, packer.height);
+			packer = new CPacker(testset(num), packer.width, packer.height);
 			if (paused)
 				advance();
 			return;
@@ -79,6 +79,6 @@ public class RectanglePacking extends ImagePacking {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { RectanglePacking.class.getName() });
+		PApplet.main(new String[] { CRectPacking.class.getName() });
 	}
 }
