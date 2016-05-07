@@ -1,12 +1,14 @@
-package circle;
+package elliptry;
 
 import java.awt.Rectangle;
 
+import circle.CIRect;
+import circle.CPU;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.event.MouseEvent;
 
-public class CCirclePacking extends PApplet {
+public class ElCirclePacking extends PApplet {
 
 	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
 
@@ -14,7 +16,7 @@ public class CCirclePacking extends PApplet {
 	float minZoom = .1f, zoom = .1f;
 	int animateMs = 1, ts = -1;
 
-	CPacker packer;
+	ElPacker packer;
 	CIRect[] imgs;
 	String mousedOver="";
 	float panX, panY;
@@ -22,7 +24,7 @@ public class CCirclePacking extends PApplet {
 	public void init() {
 
 		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/AdsByBrand/Groups/HK");
-		packer = new CPacker(imgs, width, height);
+		packer = new ElPacker(imgs, width, height);
 		if (paused)
 			advance();
 	}
@@ -50,6 +52,8 @@ public class CCirclePacking extends PApplet {
 
 	private void drawInfo() {
 
+		if (packer == null) return;
+		
 		// drawMouseCoords();
 		fill(0);
 		text("[p]ause, [r]eset, [c]lear, [s]ave, space-bar to step, mouse-wheel to zoom", 10, 20);
@@ -92,7 +96,7 @@ public class CCirclePacking extends PApplet {
 
 		noFill();
 		stroke(255, 0, 255);
-		float diam = packer.boundingDiameter;
+		float diam = packer.bounds.width;
 		ellipse(width / 2, height / 2, diam, diam);
 	}
 
@@ -100,7 +104,7 @@ public class CCirclePacking extends PApplet {
 
 		pushMatrix();
 		stroke(200);
-		translate((width - packer.boundingDiameter) / 2, (height - packer.boundingDiameter) / 2);
+		translate((width - packer.bounds.width) / 2, (height - packer.bounds.width) / 2);
 		Rectangle[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
@@ -142,11 +146,11 @@ public class CCirclePacking extends PApplet {
 			packer.reset();
 			paused = false;
 		} else if (key == 'g') {
-			packer = new CPacker(imgs, width, height);
+			packer = new ElPacker(imgs, width, height);
 			paused = false;
 		} else if (key == 's') {
 			paused = true;
-			render(OUTPUT_DIR, packer.boundingDiameter, packer.boundingDiameter);
+			render(OUTPUT_DIR, packer.bounds.width, packer.bounds.width);
 		}
 	}
 
@@ -200,7 +204,7 @@ public class CCirclePacking extends PApplet {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { CCirclePacking.class.getName() });
+		PApplet.main(new String[] { ElCirclePacking.class.getName() });
 		//System.out.println((float)(Float.MAX_VALUE*Float.MAX_VALUE*Math.PI));
 	}
 }

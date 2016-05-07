@@ -6,6 +6,8 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import elliptry.CEllipse;
+
 public class CPU {
 
 	static int[] AdSizes = { 728, 90, 300, 250, 300, 600, 320, 100, 336, 280,
@@ -56,7 +58,7 @@ public class CPU {
 		}
 	}
 
-	static float boundingDiameter(Rectangle[] r, int cx, int cy) {
+	public static float boundingDiameter(Rectangle[] r, int cx, int cy) {
 
 		float maxRadiusSoFar = 0;
 		for (int i = 0; i < r.length; i++) {
@@ -70,8 +72,23 @@ public class CPU {
 
 		return maxRadiusSoFar * 2;
 	}
+	
+	public static CEllipse boundingEllipse(Rectangle[] r, int cx, int cy) {
 
-	static float dist(float x1, float y1, float x2, float y2) {
+		float maxRadiusSoFar = 0;
+		for (int i = 0; i < r.length; i++) {
+			float d1 = dist(r[i].x, r[i].y, cx, cy); // upper-left
+			float d2 = dist(r[i].x + r[i].width, r[i].y, cx, cy); // upper-right
+			float d3 = dist(r[i].x, r[i].y + r[i].height, cx, cy); // lower-left
+			float d4 = dist(r[i].x + r[i].width, r[i].y + r[i].height, cx, cy); // lower-right
+			float maxOfCorners = Math.max(Math.max(d1, d2), Math.max(d3, d4));
+			maxRadiusSoFar = Math.max(maxRadiusSoFar, maxOfCorners);
+		}
+
+		return new CEllipse(cx, cy, maxRadiusSoFar * 2, maxRadiusSoFar * 2);
+	}
+
+	public static float dist(float x1, float y1, float x2, float y2) {
 
 		return (float) Math.sqrt(sq(x2 - x1) + sq(y2 - y1));
 	}

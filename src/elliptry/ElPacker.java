@@ -1,23 +1,27 @@
-package circle;
+package elliptry;
 
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
 
-public class CPacker {
+import circle.CMer;
+import circle.CPU;
 
-	int steps, cx, cy, width, height;
-	float boundingDiameter;
+public class ElPacker {
+
+	int steps;
+	CEllipse bounds;
 	Rectangle[] mer, rec;
+	float width, height;
 
-	public CPacker(Rectangle[] r, int cw, int ch) {
+	public ElPacker(Rectangle[] r, int cw, int ch) {
 		this.rec = r;
-		this.cx = Math.round(cw / 2f);
-		this.cy = Math.round(ch / 2f);
 		this.width = cw;
 		this.height = ch;
+		this.bounds = new CEllipse(Math.round(cw / 2f), Math.round(ch / 2f),0,0);
 		sortByArea(r);
-		alignVertically();
+		for (int i = 0; i < rec.length; i++)
+			rec[i].x = Integer.MAX_VALUE;
 	}
 	
 	public boolean complete() {
@@ -46,8 +50,8 @@ public class CPacker {
 					for (int j = 0; j < 4; j++) {
 						
 						int px = curr.x, py = curr.y;
-						float dia = testPlacement(curr, mer[i], j);
-						float area = dia < 0 ? Float.MAX_VALUE : (float) (Math.PI * (dia/2d * dia/2d));
+						float area = testPlacement(curr, mer[i], j);
+						//float area = dia < 0 ? Float.MAX_VALUE : (float) (Math.PI * (dia/2d) * (dia/2d) );
 						
 						if (area < minArea) {
 							minArea = area;
@@ -61,21 +65,16 @@ public class CPacker {
 							
 							place(curr, px, py); // revert
 						}
+						//return ++steps;
 					}
 				}		
 			}
 			else {
 
-				center(curr, cx, cy);
+				center(curr, bounds.x, bounds.y);
 			}
 			
-			mer = computeMER();
-			
-			Rectangle[] r = mer;
-			for (int i = 0; i < r.length; i++) {
-				System.out.println((char) (i + 65)+": "+r[i].x +","+r[i].y+" "+r[i].width+"x"+r[i].height);
-			}
-			System.out.println(steps+") placed: "+curr.x+","+curr.y);
+			mer = computeMER();		
 			++steps;
 		}
 		
@@ -85,8 +84,8 @@ public class CPacker {
 
 	float testPlacement(Rectangle curr, Rectangle mer, int type) {
 		 
-		int x = -1, mx = mer.x + Math.round( (width - boundingDiameter) / 2f);
-		int y = -1, my = mer.y + Math.round( (height - boundingDiameter) / 2f);
+		int x = -1, mx = mer.x + Math.round( (width - bounds.width) / 2f);
+		int y = -1, my = mer.y + Math.round( (height - bounds.height) / 2f);
 		
 		switch (type) {
 		
@@ -112,7 +111,7 @@ public class CPacker {
 		
 		place(curr, x, y);
 		
-		return intersectsPack(curr) ? -1 : CPU.boundingDiameter(placed(), cx, cy);
+		return intersectsPack(curr) ? Float.MAX_VALUE : CPU.boundingEllipse(placed(), bounds.x, bounds.y).area();
 	}
 	
 	// Dist from center point of rect to center point of pack
@@ -120,15 +119,7 @@ public class CPacker {
 		
 		int rx = r.x + Math.round(r.width / 2f);
 		int ry = r.y + Math.round(r.height / 2f);
-		return CPU.dist(rx, ry, cx, cy);
-	}
-
-	void alignVertically() {
-
-		for (int i = 0; i < rec.length; i++) {
-			rec[i].x = Integer.MAX_VALUE; 
-			rec[i].y = i== 0 ? 0 : rec[i - 1].y + rec[i - 1].height;
-		}
+		return CPU.dist(rx, ry, bounds.x, bounds.y);
 	}
 	
 	void sortByArea(Rectangle[] r) {
@@ -179,11 +170,10 @@ public class CPacker {
 	
 	Rectangle[] computeMER() {
 		
-		boundingDiameter = Math.round(CPU.boundingDiameter(placed(), cx, cy));
-		
-		//System.out.println("CPacker.mer() :: "+boundingDiameter+","+boundingDiameter);
-		float merOffsetX = cx - Math.round(boundingDiameter / 2f);
-		float merOffsetY = cy - Math.round(boundingDiameter / 2f);
+		bounds.width = bounds.height = Math.round(CPU.boundingDiameter(placed(), bounds.x, bounds.y));
+		//System.out.println("EllPacker.mer() :: "+bounds.width+","+bounds.width);
+		float merOffsetX = bounds.x - Math.round(bounds.width / 2f);
+		float merOffsetY = bounds.y - Math.round(bounds.height / 2f);
 		
 		//System.out.println("CirclePack.offsets() :: "+merOffsetX+","+merOffsetY);
 		
@@ -193,63 +183,20 @@ public class CPacker {
 			imer[i][0] -= merOffsetY;
 		}
 		//PU.out(imer);
-		int rbd = Math.round(boundingDiameter);
-		imer = CMer.MER(rbd, rbd, imer);
+		int rows = Math.round(bounds.height);
+		int cols = Math.round(bounds.width);
+		imer = CMer.MER(rows, cols, imer);
 		
 		Rectangle[] result = CMer.merToRects(imer);
 		
 		return result;//validateMer(result);		
 	}
-
-	// convert rect{x,y,w,h,} to 4 corner points
-	public int[] toCorners(Rectangle b, boolean tf) {
-		
-		int bx = Math.round( b.x + (tf ? (width - boundingDiameter) / 2f : 0));
-		int by = Math.round( b.y + (tf ? (height - boundingDiameter) / 2f : 0));
-
-		int tlX = bx, tlY = by;
-		int brX = bx + b.width, brY = by + b.height;
-		int trX = bx + b.width, trY = by;
-		int blX = bx, blY = by + b.height;
-
-		return new int[] { tlX, tlY, trX, trY, brX, brY, blX, blY };
-	}
 	
-	/*
-	 * For each rectangle in the MER, check that all four 
-	 * corners are not outside the boundingCircle.
-	 * If any are, split them into two...
-	 */
-	Rectangle[] validateMer(Rectangle[] r) {
-		
-		ArrayList<Rectangle> rl = new ArrayList<Rectangle>();
-		
-		for (int i = 0; i < r.length; i++) {
-			
-			int[] cr = toCorners(r[i], true);
-			boolean inside = false;
-			for (int j = 0; j < cr.length; j+=2) {
-				//System.out.println(PU.dist(cr[j], cr[j+1], cx, cy)+" <= "+ boundingDiameter/2);
-				if ( CPU.dist(cr[j], cr[j+1], cx, cy) <= boundingDiameter/2) {
-						inside = true;
-						break;
-				}
-			}
-			rl.add(r[i]);
-			if (!inside) {
-				if (i != 0)System.out.println("*** MER#"+i+" SPLITTING...");
-				r[i].width /= 2;
-				rl.add(new Rectangle(r[i].x + r[i].width, r[i].y, r[i].width,r[i].height));
-			}
-		}	
-		
-		return rl.toArray(new Rectangle[0]);
-	}
-
 	public void reset() {
 		steps = 0;
-		boundingDiameter = 0;
-		alignVertically();
+		bounds.width = bounds.height = 0;
+		for (int i = 0; i < rec.length; i++)
+			rec[i].x = Integer.MAX_VALUE;
 	}
 
 }

@@ -1,18 +1,19 @@
-package circle;
+package elliptry;
 
 import java.awt.Rectangle;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class CRectPacking extends CCirclePacking {
+public class ElRectPacking extends ElCirclePacking {
 
 	int num = 200, colors[];
 
 	public void init() {
+		randomSeed(0);
 		zoom = .5f;
 		paused = true;
-		packer = new CPacker(testset(num), width, height);
+		packer = new ElPacker(testset(num), width, height);
 		if (paused)
 			advance();
 	}
@@ -43,6 +44,7 @@ public class CRectPacking extends CCirclePacking {
 		return r;
 	}
 	
+	
 	public void drawPack(PGraphics p) {
 		p.stroke(200);
 		Rectangle[] r = packer.rec;
@@ -68,7 +70,7 @@ public class CRectPacking extends CCirclePacking {
 
 	public void keyPressed() {
 		if (key == 'g') {
-			packer = new CPacker(testset(num), packer.width, packer.height);
+			packer = new ElPacker(testset(num), packer.bounds.width, packer.bounds.width);
 			if (paused)
 				advance();
 			return;
@@ -78,6 +80,6 @@ public class CRectPacking extends CCirclePacking {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { CRectPacking.class.getName() });
+		PApplet.main(new String[] { ElRectPacking.class.getName() });
 	}
 }
