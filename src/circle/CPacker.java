@@ -38,8 +38,8 @@ public class CPacker {
 			Rectangle curr = rec[steps];
 			if (steps > 0) {
 				
-				float bestMaxCornerDist = Float.MAX_VALUE;
-				float bestMaxCenterDist = Float.MAX_VALUE;
+				float minArea = Float.MAX_VALUE;
+				float minCenterDist = Float.MAX_VALUE;
 				
 				for (int i = 0; i < mer.length; i++) {
 
@@ -47,14 +47,15 @@ public class CPacker {
 						
 						int px = curr.x, py = curr.y;
 						float dia = testPlacement(curr, mer[i], j);
+						float area = dia < 0 ? Float.MAX_VALUE : (float) (Math.PI * (dia/2d * dia/2d));
 						
-						if (dia < bestMaxCornerDist) {
-							bestMaxCornerDist = dia;
-							bestMaxCenterDist = centerPointDist(curr);
+						if (area < minArea) {
+							minArea = area;
+							minCenterDist = centerPointDist(curr);
 						}
-						else if (dia == bestMaxCornerDist && centerPointDist(curr) < bestMaxCenterDist) {
-							bestMaxCornerDist = dia;
-							bestMaxCenterDist = centerPointDist(curr);
+						else if (area == minArea && centerPointDist(curr) < minCenterDist) {
+							minArea = area;
+							minCenterDist = centerPointDist(curr);
 						}
 						else {
 							
@@ -106,7 +107,7 @@ public class CPacker {
 		
 		place(curr, x, y);
 		
-		return intersectsPack(curr) ? Float.MAX_VALUE : CPU.boundingDiameter(placed(), cx, cy);
+		return intersectsPack(curr) ? -1 : CPU.boundingDiameter(placed(), cx, cy);
 	}
 	
 	// Dist from center point of rect to center point of pack

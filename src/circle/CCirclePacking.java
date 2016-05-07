@@ -201,5 +201,6 @@ public class CCirclePacking extends PApplet {
 	public static void main(String[] args) {
 
 		PApplet.main(new String[] { CCirclePacking.class.getName() });
+		//System.out.println((float)(Float.MAX_VALUE*Float.MAX_VALUE*Math.PI));
 	}
 }

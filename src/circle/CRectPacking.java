@@ -12,7 +12,6 @@ public class CRectPacking extends CCirclePacking {
 	public void init() {
 
 		zoom = .5f;
-		paused = true;
 		packer = new CPacker(testset(num), width, height);
 		if (paused)
 			advance();
