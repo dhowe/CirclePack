@@ -12,16 +12,16 @@ public class ElPacker {
 	int steps;
 	CEllipse bounds;
 	Rectangle[] mer, rec;
-	float width, height;
+	float width, height, ratio;
 
 	public ElPacker(Rectangle[] r, int cw, int ch) {
 		this.rec = r;
 		this.width = cw;
 		this.height = ch;
-		this.bounds = new CEllipse(Math.round(cw / 2f), Math.round(ch / 2f),0,0);
-		sortByArea(r);
-		for (int i = 0; i < rec.length; i++)
-			rec[i].x = Integer.MAX_VALUE;
+		this.ratio = cw / ch;
+		System.out.println("RATIO: "+ratio);
+		this.bounds = new CEllipse(Math.round(cw / 2f), Math.round(ch / 2f), 0, 0);
+		CPU.sortByArea(r);
 	}
 	
 	public boolean complete() {
@@ -111,7 +111,8 @@ public class ElPacker {
 		
 		place(curr, x, y);
 		
-		return intersectsPack(curr) ? Float.MAX_VALUE : CPU.boundingEllipse(placed(), bounds.x, bounds.y).area();
+		return intersectsPack(curr) ? Float.MAX_VALUE : 
+			CPU.boundingEllipse(placed(), bounds.x, bounds.y, ratio).area();
 	}
 	
 	// Dist from center point of rect to center point of pack
@@ -122,22 +123,7 @@ public class ElPacker {
 		return CPU.dist(rx, ry, bounds.x, bounds.y);
 	}
 	
-	void sortByArea(Rectangle[] r) {
-		java.util.Arrays.sort(r, new java.util.Comparator<Rectangle>() {
-			public int compare(Rectangle b, Rectangle a) {
-				return Float.compare(a.width * a.height, b.width * b.height);
-			}
-		});
-	}
-	
-	void sortByArea(Shape[] r) {
-		java.util.Arrays.sort(r, new java.util.Comparator<Shape>() {
-			public int compare(Shape s1, Shape s2) {
-				Rectangle a = s1.getBounds(), b = s2.getBounds();
-				return Float.compare(a.width * a.height, b.width * b.height);
-			}
-		});
-	}
+
 	
 	boolean intersectsPack(Rectangle curr) {
 		Rectangle[] pack = placed();
@@ -170,7 +156,10 @@ public class ElPacker {
 	
 	Rectangle[] computeMER() {
 		
-		bounds.width = bounds.height = Math.round(CPU.boundingDiameter(placed(), bounds.x, bounds.y));
+		CEllipse ellipse = CPU.boundingEllipse(placed(), bounds.x, bounds.y, ratio);
+		bounds.width = ellipse.width;
+		bounds.height = ellipse.height;
+		
 		//System.out.println("EllPacker.mer() :: "+bounds.width+","+bounds.width);
 		float merOffsetX = bounds.x - Math.round(bounds.width / 2f);
 		float merOffsetY = bounds.y - Math.round(bounds.height / 2f);

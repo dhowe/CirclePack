@@ -65,9 +65,6 @@ public class Geom {
 				rect = Rect.fromCorners(p[7], p[3]);
 		}
 
-		// ellipse.width = sqrt(rect.width^2 + ratio^2 * rect.height^2)
-		// double ew = Math.sqrt((rect.width * rect.width) + (ratio * ratio) *
-		// (rect.height * rect.height));
 		double ew = Math.sqrt((rect.width * rect.width) + (ratio * ratio) * (rect.height * rect.height));
 		double eh = ew / ratio;
 

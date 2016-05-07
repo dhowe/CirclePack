@@ -6,6 +6,8 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import processing.core.PApplet;
+import jcp.util.*;
 import elliptry.CEllipse;
 
 public class CPU {
@@ -57,7 +59,15 @@ public class CPU {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public static void sortByArea(Rectangle[] r) {
+		java.util.Arrays.sort(r, new java.util.Comparator<Rectangle>() {
+			public int compare(Rectangle b, Rectangle a) {
+				return Float.compare(a.width * a.height, b.width * b.height);
+			}
+		});
+	}
+	
 	public static float boundingDiameter(Rectangle[] r, int cx, int cy) {
 
 		float maxRadiusSoFar = 0;
@@ -72,8 +82,85 @@ public class CPU {
 
 		return maxRadiusSoFar * 2;
 	}
+
+	public static Rectangle[] testset(PApplet p, int[] colors) {
+		
+		//p.randomSeed(0);
+		for (int i = 0; i < colors.length; i++) {
+			float r = p.random(0, 150);
+			colors[i] = p.color(225 - r, p.random(0, r), 100 + r);
+		}
+
+		Rectangle[] r = new Rectangle[colors.length];
+		for (int i = 0; i < r.length; i++) {
+			int w = (int) (20 + p.random(200));
+			int h = (int) (20 + p.random(200));
+
+			if (p.random(0,1) < .01) {
+				w = 300;
+				h = 600;
+			}
+			if (p.random(0,1) < .02) {
+				w = 728;
+				h = 90;
+			}
+			r[i] = new Rectangle(Integer.MAX_VALUE, 0, w, h);
+		}
+		return r;
+	}
 	
-	public static CEllipse boundingEllipse(Rectangle[] r, int cx, int cy) {
+	public static CEllipse boundingEllipse(Rectangle[] r, int cx, int cy, float ratio) {
+
+		Rect rect = alignedBoundingRect(r, cx, cy);
+		float diam = boundingCircle(r, cx, cy);
+		
+		Pt[] p = rect.intersectsCircle(cx, cy, diam / 2f);
+		if (p.length == 8) {
+			if (ratio > 1)
+				rect = Rect.fromCorners(p[0], p[4]);
+			else if (ratio < 1)
+				rect = Rect.fromCorners(p[7], p[3]);
+		}
+
+		double ew = Math.sqrt((rect.width * rect.width) + (ratio * ratio) * (rect.height * rect.height));
+		double eh = ew / ratio;
+
+		return new CEllipse(cx, cy, ew, eh);
+	}
+
+	public static Rect alignedBoundingRect(Rectangle[] r, int cx, int cy) {
+
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
+
+		for (int i = 0; i < r.length; i++) {
+			minX = Math.min(minX, r[i].x);
+			minY = Math.min(minY, r[i].y);
+			maxX = Math.max(maxX, r[i].x + r[i].width);
+			maxY = Math.max(maxY, r[i].y + r[i].height);
+		}
+
+		int w = Math.round(Math.max(Math.abs(minX - cx), Math.abs(maxX - cx)));
+		int h = Math.round(Math.max(Math.abs(minY - cy), Math.abs(maxY - cy)));
+
+		return new Rect(cx - w, cy - h, w * 2, h * 2);
+	}
+	
+	public static float boundingCircle(Rectangle[] r, int cx, int cy) { // not used
+
+		float maxRadiusSoFar = 0;
+		for (int i = 0; i < r.length; i++) {
+			float d1 = dist(r[i].x, r[i].y, cx, cy); // upper-left
+			float d2 = dist(r[i].x + r[i].width, r[i].y, cx, cy); // upper-right
+			float d3 = dist(r[i].x, r[i].y + r[i].height, cx, cy); // lower-left
+			float d4 = dist(r[i].x + r[i].width, r[i].y + r[i].height, cx, cy); // lower-right
+			float maxOfCorners = Math.max(Math.max(d1, d2), Math.max(d3, d4));
+			maxRadiusSoFar = Math.max(maxRadiusSoFar, maxOfCorners);
+		}
+
+		return maxRadiusSoFar * 2;
+	}
+
+	public static CEllipse boundingEllipse1(Rectangle[] r, int cx, int cy, float ratio) {
 
 		float maxRadiusSoFar = 0;
 		for (int i = 0; i < r.length; i++) {

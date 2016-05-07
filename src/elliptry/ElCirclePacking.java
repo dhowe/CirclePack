@@ -52,8 +52,6 @@ public class ElCirclePacking extends PApplet {
 
 	private void drawInfo() {
 
-		if (packer == null) return;
-		
 		// drawMouseCoords();
 		fill(0);
 		text("[p]ause, [r]eset, [c]lear, [s]ave, space-bar to step, mouse-wheel to zoom", 10, 20);
@@ -96,15 +94,15 @@ public class ElCirclePacking extends PApplet {
 
 		noFill();
 		stroke(255, 0, 255);
-		float diam = packer.bounds.width;
-		ellipse(width / 2, height / 2, diam, diam);
+		CEllipse e = packer.bounds;
+		ellipse(e.x,e.y,e.width,e.height);
 	}
 
 	void drawMer() {
 
 		pushMatrix();
 		stroke(200);
-		translate((width - packer.bounds.width) / 2, (height - packer.bounds.width) / 2);
+		translate((width - packer.bounds.width) / 2, (height - packer.bounds.height) / 2);
 		Rectangle[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
@@ -116,12 +114,7 @@ public class ElCirclePacking extends PApplet {
 		popMatrix();
 	}
 
-	
 	public void advance() {
-//		if (packer.steps > 0)
-//			System.out.println(packer.steps + ") " + (millis() - ts) + "ms  (" + packer.boundingDiameter + ")"); // +
-//																																																						// packer.mer.length																																																						// +
-																																																						// ")");
 		packer.step();
 		ts = millis();
 	}
@@ -150,7 +143,7 @@ public class ElCirclePacking extends PApplet {
 			paused = false;
 		} else if (key == 's') {
 			paused = true;
-			render(OUTPUT_DIR, packer.bounds.width, packer.bounds.width);
+			render(OUTPUT_DIR, packer.bounds.width, packer.bounds.height);
 		}
 	}
 
@@ -163,15 +156,6 @@ public class ElCirclePacking extends PApplet {
 			zoom *= 1.4;
 		else if (e == 1 && zoom > minZoom)
 			zoom /= 1.4;
-	}
-
-	int[] testSetColors(int num) {
-		int[] colors = new int[num];
-		for (int i = 0; i < colors.length; i++) {
-			float r = random(0, 150);
-			colors[i] = color(225 - r, random(0, r), 100 + r);
-		}
-		return colors;
 	}
 
 	public void render(String outDir, float w, float h) {

@@ -60,14 +60,7 @@ public class CCirclePacking extends PApplet {
 		text(mousedOver, 10, 100);
 	}
 	
-	public void drawPack(PGraphics p) {
-		p.stroke(200);
-		for (int i = 0; i < packer.rec.length; i++) {
-			CIRect ir = (CIRect) packer.rec[i];
-			p.image(ir.image, ir.x, ir.y, imgs[i].width, imgs[i].height);
-		}
-	}
-	
+
 	public void drawMouseOvers() {
 		
 		mousedOver = "";
@@ -88,6 +81,14 @@ public class CCirclePacking extends PApplet {
 		text(zoom == 1 ? (int) mouseX + "," + (int) mouseY : "?", 10, 30);
 	}
 
+	public void drawPack(PGraphics p) {
+		p.stroke(200);
+		for (int i = 0; i < packer.rec.length; i++) {
+			CIRect ir = (CIRect) packer.rec[i];
+			p.image(ir.image, ir.x, ir.y, imgs[i].width, imgs[i].height);
+		}
+	}
+	
 	void drawBounds() {
 
 		noFill();
@@ -190,7 +191,7 @@ public class CCirclePacking extends PApplet {
 	}
 
 	public void settings() {
-		size(2400, 1300);
+		size(2000, 1300);
 	}
 
 	public void setup() {
