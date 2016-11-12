@@ -1,14 +1,15 @@
-package circle;
+package app;
 
 import java.awt.Rectangle;
 
+import circle.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.event.MouseEvent;
 
-public class CCirclePacking extends PApplet {
+public class ImagesInCircle extends PApplet {
 
-	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
+	String OUTPUT_DIR = "~/Desktop";
 
 	boolean paused = false;
 	float minZoom = .1f, zoom = .1f;
@@ -21,7 +22,7 @@ public class CCirclePacking extends PApplet {
 
 	public void init() {
 
-		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/AdsByBrand/Groups/HK");
+		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/Groups/HK");
 		packer = new CPacker(imgs, width, height);
 		if (paused)
 			advance();
@@ -200,7 +201,7 @@ public class CCirclePacking extends PApplet {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { CCirclePacking.class.getName() });
+		PApplet.main(new String[] { ImagesInCircle.class.getName() });
 		//System.out.println((float)(Float.MAX_VALUE*Float.MAX_VALUE*Math.PI));
 	}
 }

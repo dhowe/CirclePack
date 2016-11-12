@@ -1,46 +1,21 @@
-package circle;
+package app;
 
 import java.awt.Rectangle;
 
+import circle.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class CRectPacking extends CCirclePacking {
+public class ColorsInCircle extends ImagesInCircle {
 
-	int num = 200, colors[];
+	int[] colors = new int[200];
 
 	public void init() {
 		zoom = .5f;
-		paused = true;
-		packer = new CPacker(testset(num), width, height);
+		//paused = true;
+		packer = new CPacker(CPU.testset(this, colors), width, height);
 		if (paused)
 			advance();
-	}
-	
-	private Rectangle[] testset(int num) {
-		randomSeed(0);
-		colors = new int[num];
-		for (int i = 0; i < colors.length; i++) {
-			float r = random(0, 150);
-			colors[i] = color(225 - r, random(0, r), 100 + r);
-		}
-
-		Rectangle[] r = new Rectangle[num];
-		for (int i = 0; i < r.length; i++) {
-			int w = (int) (20 + random(200));
-			int h = (int) (20 + random(200));
-
-			if (random(0,1) < .01) {
-				w = 300;
-				h = 600;
-			}
-			if (random(0,1) < .02) {
-				w = 728;
-				h = 90;
-			}
-			r[i] = new Rectangle(Integer.MAX_VALUE, 0, w, h);
-		}
-		return r;
 	}
 	
 	public void drawPack(PGraphics p) {
@@ -68,7 +43,7 @@ public class CRectPacking extends CCirclePacking {
 
 	public void keyPressed() {
 		if (key == 'g') {
-			packer = new CPacker(testset(num), packer.width, packer.height);
+			packer = new CPacker(CPU.testset(this, colors), width, height);
 			if (paused)
 				advance();
 			return;
@@ -78,6 +53,6 @@ public class CRectPacking extends CCirclePacking {
 
 	public static void main(String[] args) {
 
-		PApplet.main(new String[] { CRectPacking.class.getName() });
+		PApplet.main(new String[] { ColorsInCircle.class.getName() });
 	}
 }

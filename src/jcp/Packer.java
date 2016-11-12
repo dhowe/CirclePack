@@ -6,9 +6,12 @@ import jcp.util.*;
 
 public class Packer {
 
-	Ellipse bounds;
-	Rect[] mer, rec;
-	float ratio, width, height;
+	public Ellipse bounds;
+	public Rect[] mer;
+	public Rect[] rec;
+	public float ratio;
+	float width;
+	float height;
 	int steps, maxOverlapArea = 300;
 
 	public Packer(Rect[] r, float cw, float ch) {
@@ -20,11 +23,11 @@ public class Packer {
 		this.bounds = new Ellipse(Math.round(cw / 2f), Math.round(ch / 2f), cw, ch);
 		// sortByMaxEdge(r);
 		sortByArea(r);
-		
+
 		if (r.length > 0 && r[0] instanceof IRect) {
 			System.out.println();
 			for (int i = 0; i < r.length; i++) {
-				System.out.println(i+") "+((IRect) r[i]).name + ": " + r[i].area());
+				System.out.println(i + ") " + ((IRect) r[i]).name + ": " + r[i].area());
 			}
 		}
 	}
@@ -35,8 +38,7 @@ public class Packer {
 		bounds = Geom.boundingEllipse(sofar, bounds.x, bounds.y, ratio);
 
 		// translate packed rects from bounds.x/bounds.y to 0,0
-		int[][] imer = Mer.rectsToMer(sofar, -bounds.x + Math.round(bounds.width / 2f),
-				-bounds.y + Math.round(bounds.height / 2f));
+		int[][] imer = Mer.rectsToMer(sofar, -bounds.x + Math.round(bounds.width / 2f), -bounds.y + Math.round(bounds.height / 2f));
 
 		imer = Mer.MER(Math.round(bounds.height), Math.round(bounds.width), imer);
 
@@ -69,16 +71,14 @@ public class Packer {
 				for (int i = mer.length - 1; i >= 0; i--) {
 
 					dbug = (false && i == 0);
-					if (dbug)
-						System.out.println("MER#" + i);
+					if (dbug) System.out.println("MER#" + i);
 
 					for (int j = 0; j < 4; j++) {
 
 						int px = curr.x, py = curr.y;
 						float ellipseArea = testPlacement(curr, mer[i], j);
 
-						if (dbug)
-							System.out.println("  " + j + " = " + (ellipseArea == Float.MAX_VALUE ? "FAIL" : ellipseArea));
+						if (dbug) System.out.println("  " + j + " = " + (ellipseArea == Float.MAX_VALUE ? "FAIL" : ellipseArea));
 
 						if (ellipseArea < bestEllipseArea) {
 
@@ -87,22 +87,24 @@ public class Packer {
 							bestEllipseArea = ellipseArea;
 							bestCenterDist = centerPointDist(curr);
 
-						} else if (ellipseArea == bestEllipseArea && centerPointDist(curr) < bestCenterDist) {
+						}
+						else if (ellipseArea == bestEllipseArea && centerPointDist(curr) < bestCenterDist) {
 
 							bi = i;
 							bj = j;
 							bestEllipseArea = ellipseArea;
 							bestCenterDist = centerPointDist(curr);
 
-						} else {
+						}
+						else {
 
 							place(curr, px, py); // revert
 						}
 					}
-					if (dbug)
-						System.out.println();
+					if (dbug) System.out.println();
 				}
-			} else {
+			}
+			else {
 
 				center(curr, bounds.x, bounds.y);
 			}
@@ -119,6 +121,7 @@ public class Packer {
 	}
 
 	public void back() {
+
 		rec[--steps].x = Integer.MAX_VALUE;
 		mer = computeMER();
 	}
@@ -130,24 +133,24 @@ public class Packer {
 
 		switch (type) {
 
-		case 0:
-			x = mx;
-			y = my;
-			break;
-		case 1:
-			x = mx + (mer.width - curr.width);
-			y = my;
-			break;
-		case 2:
-			x = mx + (mer.width - curr.width);
-			y = my + (mer.height - curr.height);
-			break;
-		case 3:
-			x = mx;
-			y = my + (mer.height - curr.height);
-			break;
-		default:
-			throw new RuntimeException();
+			case 0:
+				x = mx;
+				y = my;
+				break;
+			case 1:
+				x = mx + (mer.width - curr.width);
+				y = my;
+				break;
+			case 2:
+				x = mx + (mer.width - curr.width);
+				y = my + (mer.height - curr.height);
+				break;
+			case 3:
+				x = mx;
+				y = my + (mer.height - curr.height);
+				break;
+			default:
+				throw new RuntimeException();
 		}
 
 		place(curr, x, y);
@@ -165,22 +168,29 @@ public class Packer {
 	}
 
 	void sortByArea(Rect[] r) {
+
 		java.util.Arrays.sort(r, new java.util.Comparator<Rect>() {
+
 			public int compare(Rect b, Rect a) {
+
 				return Float.compare(a.width * a.height, b.width * b.height);
 			}
 		});
 	}
 
 	static void sortByMaxEdge(Rect[] r) {
+
 		java.util.Arrays.sort(r, new java.util.Comparator<Rect>() {
+
 			public int compare(Rect b, Rect a) {
+
 				return Float.compare(Math.max(a.width, a.height), Math.max(b.width, b.height));
 			}
 		});
 	}
 
 	boolean intersectsPack(Rect curr) {
+
 		Rect[] pack = placed();
 		for (int i = 0; i < pack.length; i++) {
 			if (curr != pack[i]) {
@@ -199,21 +209,22 @@ public class Packer {
 	}
 
 	void center(Rect r, int x, int y) {
+
 		r.x = x - Math.round(r.width / 2f);
 		r.y = y - Math.round(r.height / 2f);
 	}
 
 	void place(Rect r, int x, int y) {
+
 		r.x = x;
 		r.y = y;
 	}
 
-	Rect[] placed() {
+	public Rect[] placed() {
 
 		ArrayList<Rect> p = new ArrayList<Rect>();
 		for (int i = 0; i < rec.length; i++) {
-			if (rec[i].x != Integer.MAX_VALUE)
-				p.add(rec[i]);
+			if (rec[i].x != Integer.MAX_VALUE) p.add(rec[i]);
 		}
 		return p.toArray(new Rect[0]);
 	}
@@ -246,8 +257,7 @@ public class Packer {
 
 			if (!inside) { // all four corners are outside our bounds
 
-				if (i != 0)
-					continue; // Only the first ?
+				if (i != 0) continue; // Only the first ?
 				// System.out.println("*** MER#" + i + " SPLITTING...");
 				mer[i].width /= 2;
 				rl.add(new Rect(mer[i].x + mer[i].width, mer[i].y, mer[i].width, mer[i].height));
@@ -260,8 +270,7 @@ public class Packer {
 	/* convert rect{x,y,w,h,} to 4 corner points */
 	public Pt[] toCorners(Rect bb, boolean tf) {
 
-		return !tf ? bb.toCorners() : bb.toCorners(Math.round((width - bounds.width) / 2f),
-				Math.round((width - bounds.width) / 2f));
+		return !tf ? bb.toCorners() : bb.toCorners(Math.round((width - bounds.width) / 2f), Math.round((width - bounds.width) / 2f));
 	}
 
 	public boolean complete() {
@@ -275,6 +284,7 @@ public class Packer {
 	}
 
 	public void reset() {
+
 		steps = 0;
 		bounds.width = bounds.height = 0;
 		for (int i = 0; i < rec.length; i++) {

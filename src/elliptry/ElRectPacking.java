@@ -2,6 +2,8 @@ package elliptry;
 
 import java.awt.Rectangle;
 
+import jcp.util.*;
+import circle.CPU;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
@@ -16,6 +18,41 @@ public class ElRectPacking extends ElCirclePacking {
 		packer = new ElPacker(testset(num), width, height);
 		if (paused)
 			advance();
+	}
+	
+	public void draw() {
+
+		background(255);
+
+		drawInfo();
+		
+		panX = (1 - zoom) * width / 2;
+		panY = (1 - zoom) * height / 2;
+		translate(panX, panY);
+		scale(zoom);
+
+		drawMer();
+		drawPack(getGraphics());
+		
+		Rect r = CPU.boundingRect(packer.placed());
+		noFill();
+		stroke(200,0,0);
+		P5.drawRect(this, r);
+	  float d = CPU.boundingCircle(packer.placed(),width/2,height/2);
+		noFill();
+		stroke(0,200,0);
+		ellipse(width/2,height/2,d,d);
+		
+		drawBounds();
+		//drawMouseOvers();
+
+		if (!paused && (millis() - ts >= animateMs)) {
+			advance();
+		}
+	}
+	
+	public static void drawEllipse(PApplet p, CEllipse e) {
+		p.ellipse(e.x, e.y, e.width, e.height);
 	}
 	
 	private Rectangle[] testset(int num) {

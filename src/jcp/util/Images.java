@@ -58,21 +58,22 @@ public class Images {
 		return imageFiles(path, -1);
 	}
 
-	public static IRect[] loadIRects(String path) {
+	public static IRect[] loadAsIRects(String path) {
 
-		return loadIRects(path, -1);
+		return loadAsIRects(path, -1);
 	}
 
-	public static IRect[] loadIRects(String path, int maxNum) {
-		return loadIRects(path, new String[0], maxNum);
+	public static IRect[] loadAsIRects(String path, int maxNum) {
+		return loadAsIRects(path, new String[0], maxNum);
 	}
 
-	public static IRect[] loadIRects(String path, String[] folders, int maxNum) {
-		return loadIRects(path, folders, -1, maxNum);
+	public static IRect[] loadAsIRects(String path, String[] folders, int maxNum) {
+		return loadAsIRects(path, folders, -1, maxNum);
 	}
 
-	public static IRect[] loadIRects(String path, String[] folders, int maxPerFolder, int maxNum) {
+	public static IRect[] loadAsIRects(String path, String[] folders, int maxPerFolder, int maxNum) {
 
+		//System.out.println("Images.loadAsIRects: "+path+","+Arrays.asList(folders)+","+maxPerFolder+","+maxNum);
 		File[] ifs = imageFiles(path, folders, maxPerFolder, maxNum);
 		List<IRect> pl = new ArrayList<IRect>();
 
@@ -160,20 +161,33 @@ public class Images {
 	public static File[] imageFiles(String dir, String[] folders, int maxPerFolder, int maxNum) {
 
 		List<File> files = new ArrayList<File>();
+		
+		if (maxNum < 0) maxNum = Integer.MAX_VALUE;
+		
 		// If we have folders divide equally between them...
 		if (folders.length > 0 && maxPerFolder < 0 && maxNum < Integer.MAX_VALUE) {
 
 			maxPerFolder = (int) Math.ceil(maxNum / (float) folders.length);
-			System.out.println("Found " + folders.length + " folderNames for total=" + maxNum + ". Setting maxPerFolder="
-					+ maxPerFolder);
+			System.out.println("Found " + folders.length + " folderNames for total=" 
+					+ maxNum + ". Setting maxPerFolder="+ maxPerFolder);
 		}
+		
 		imageFiles(files, FileSystems.getDefault().getPath(dir), Arrays.asList(folders), maxPerFolder, maxNum);
+		
 		return files.toArray(new File[0]);
 	}
 
+	/**
+	 * Load image files recursively (except those starting with _) 
+	 * @param files
+	 * @param dir
+	 * @param subfolders
+	 * @param maxPerFolder
+	 * @param maxTotal
+	 */
 	public static void imageFiles(List<File> files, Path dir, List<String> subfolders, int maxPerFolder, int maxTotal) {
 
-		// System.out.println("CALL: imageFiles: "+dir);
+		//System.out.println("CALL: imageFiles: "+dir+" subs: "+ Arrays.asList(subfolders));
 		int count = 0, max = maxTotal < 0 ? Integer.MAX_VALUE : maxTotal;
 		int maxPer = maxPerFolder < 0 ? Integer.MAX_VALUE : maxPerFolder;
 
@@ -182,11 +196,17 @@ public class Images {
 			for (Path path : stream) {
 
 				File file = path.toFile();
+				
+				if (file.getName().startsWith("_")) continue;
 
 				if (path.toFile().isDirectory()) {
 
-					if (subfolders.contains(file.getName()))
+					//imageFiles(files, path, subfolders, maxPerFolder, max);
+					if (subfolders.size() == 0 || subfolders.contains(file.getPath()))
 						imageFiles(files, path, subfolders, maxPerFolder, max);
+					else {
+						System.out.println("skip folder: "+file);
+					}
 
 				} else {
 

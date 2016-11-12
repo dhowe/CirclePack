@@ -12,13 +12,13 @@ public class ElPacker {
 	int steps;
 	CEllipse bounds;
 	Rectangle[] mer, rec;
-	float width, height;
+	float width, height, ratio = 1;
 
 	public ElPacker(Rectangle[] r, int cw, int ch) {
 		this.rec = r;
 		this.width = cw;
 		this.height = ch;
-		this.bounds = new CEllipse(Math.round(cw / 2f), Math.round(ch / 2f),0,0);
+		this.bounds = new CEllipse(Math.round(cw / 2f), Math.round(ch / 2f), 0, 0);
 		sortByArea(r);
 		for (int i = 0; i < rec.length; i++)
 			rec[i].x = Integer.MAX_VALUE;
@@ -111,7 +111,8 @@ public class ElPacker {
 		
 		place(curr, x, y);
 		
-		return intersectsPack(curr) ? Float.MAX_VALUE : CPU.boundingEllipse(placed(), bounds.x, bounds.y).area();
+		return intersectsPack(curr) ? Float.MAX_VALUE : 
+			CPU.boundingEllipse(placed(), bounds.x, bounds.y, ratio).area();
 	}
 	
 	// Dist from center point of rect to center point of pack
@@ -170,7 +171,9 @@ public class ElPacker {
 	
 	Rectangle[] computeMER() {
 		
-		bounds.width = bounds.height = Math.round(CPU.boundingDiameter(placed(), bounds.x, bounds.y));
+		bounds.width = Math.round(CPU.boundingEllipse(placed(), bounds.x, bounds.y,ratio).width);
+		bounds.height = Math.round(CPU.boundingEllipse(placed(), bounds.x, bounds.y,ratio).height);
+		//bounds.width = bounds.height = Math.round(CPU.boundingCircle(placed(), bounds.x, bounds.y));
 		//System.out.println("EllPacker.mer() :: "+bounds.width+","+bounds.width);
 		float merOffsetX = bounds.x - Math.round(bounds.width / 2f);
 		float merOffsetY = bounds.y - Math.round(bounds.height / 2f);
@@ -192,6 +195,8 @@ public class ElPacker {
 		return result;//validateMer(result);		
 	}
 	
+
+
 	public void reset() {
 		steps = 0;
 		bounds.width = bounds.height = 0;

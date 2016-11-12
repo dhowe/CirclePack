@@ -1,18 +1,24 @@
-package jcp;
+package app;
 
+import java.io.*;
+import java.util.*;
+
+import jcp.Packer;
 import jcp.util.*;
-import processing.core.PApplet;
-import processing.core.PGraphics;
+import processing.core.*;
 import processing.event.MouseEvent;
 
 public class ImagePacking extends PApplet {
 
 	///////////////////////// Configuration ///////////////////////////////////
-	String INPUT_DIR = "/Users/dhowe/Desktop/AdCollage/759-ad-images";
-	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
-	String FOLDER_FILE = null ; //"categories/cars.txt";
-	int TOTAL = -1;//200;
+	
+	String INPUT_DIR = USER_HOME + "/Desktop/AdCollage/759-ad-images"; // images here
+	String OUTPUT_DIR = USER_HOME + "/Desktop";	// [s]ave to this dir
+	int MAX_NUM_IMAGES = -1; // -1 for unlimited, files/dirs prefixed with '_' are ignored
+		
 	/////////////////////////////////////////////////////////////////////////
+	
+	static String USER_HOME = System.getProperty("user.home");
 	
 	int ts, animateMs;
 	boolean paused = false;
@@ -21,12 +27,38 @@ public class ImagePacking extends PApplet {
 	Packer packer;
 	IRect[] imgs;
 
+	
+	public void settings() {
+		size(2000, 1000); 						// size determines aspect ratio for packing
+	}
+	
 	public void init() {
 		
-		String[] folders = FOLDER_FILE != null ?  loadStrings(FOLDER_FILE) : new String[0];
-		imgs = Images.loadIRects(INPUT_DIR, folders, TOTAL);
+		imgs = Images.loadAsIRects(INPUT_DIR, MAX_NUM_IMAGES);
+		if (imgs.length < 1) throw new RuntimeException("No images found");
 		packer = new Packer(imgs, width, height);
 		if (paused) advance();
+	}
+
+	static String[] getFolders(String path) {
+		List<String> files = new ArrayList<String>();
+		folders(files, new File(path));
+		return files.toArray(new String[0]);
+	}
+	
+	static public void folders(List<String> files, File file) {
+			if (file.isDirectory()) {
+				files.add(file.getPath());
+				File[] children = file.listFiles();
+		    for (File child : children) {
+		    	folders(files, child);
+		    }
+			}
+	}
+
+	public void setup() {
+		surface.setLocation(1200, 0);
+		init();
 	}
 
 	public void draw() {
@@ -69,7 +101,7 @@ public class ImagePacking extends PApplet {
 
 		// drawMouseCoords();
 		fill(0);
-		text("[p]ause, [r]eset, [c]lear, space-bar to step, mouse-wheel to zoom", 10, 20);
+		text("[p]ause, [r]eset, [c]lear, [s] to save, space-bar to step, mouse-wheel to zoom", 10, 20);
 		int percent = (int)(packer.percent()*100);
 		text("zoom: "+zoom, 10, 40);
 		text("aspect: "+packer.ratio, 10, 60);
@@ -130,8 +162,7 @@ public class ImagePacking extends PApplet {
 			rect(r[i].x, r[i].y, r[i].width, r[i].height);
 			fill(0);
 			text(i, r[i].x + r[i].width / 2, r[i].y + r[i].height / 2);
-			// text((char) (i + 65), r[i].x + r[i].width / 2, r[i].y + r[i].height /
-			// 2);
+			// text((char) (i + 65), r[i].x + r[i].width / 2, r[i].y + r[i].height/2);
 		}
 		popMatrix();
 	}
@@ -208,17 +239,7 @@ public class ImagePacking extends PApplet {
 			System.err.println("Write failed for: " + name);
 	}
 
-	public void settings() {
-		size(2000, 1000);
-	}
-
-	public void setup() {
-		surface.setLocation(1200, 0);
-		init();
-	}
-
 	public static void main(String[] args) {
-
 		PApplet.main(new String[] { ImagePacking.class.getName() });
 	}
 }

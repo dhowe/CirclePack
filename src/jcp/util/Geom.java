@@ -18,7 +18,7 @@ public class Geom {
 		lineCircleIntersects(a1, a2, c, r, points);
 		return points.toArray(new Pt[0]);
 	}
-
+	
 	static void lineCircleIntersects(Pt a1, Pt a2, Pt c, float r, List<Pt> points) {
 
 		float a = (a2.x - a1.x) * (a2.x - a1.x) + (a2.y - a1.y) * (a2.y - a1.y);

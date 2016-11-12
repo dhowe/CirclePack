@@ -50,7 +50,7 @@ public class ElCirclePacking extends PApplet {
 		}
 	}
 
-	private void drawInfo() {
+	public void drawInfo() {
 
 		if (packer == null) return;
 		
@@ -96,8 +96,8 @@ public class ElCirclePacking extends PApplet {
 
 		noFill();
 		stroke(255, 0, 255);
-		float diam = packer.bounds.width;
-		ellipse(width / 2, height / 2, diam, diam);
+		//float diam = packer.bounds.width;
+		ellipse(width / 2, height / 2,  packer.bounds.width,  packer.bounds.height);
 	}
 
 	void drawMer() {
