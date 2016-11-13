@@ -8,7 +8,7 @@ import jcp.util.*;
 import processing.core.*;
 import processing.event.MouseEvent;
 
-public class ImagePacking extends PApplet {
+public class ImagesInRect extends PApplet {
 
 	///////////////////////// Configuration ///////////////////////////////////
 	
@@ -240,6 +240,6 @@ public class ImagePacking extends PApplet {
 	}
 
 	public static void main(String[] args) {
-		PApplet.main(new String[] { ImagePacking.class.getName() });
+		PApplet.main(new String[] { ImagesInRect.class.getName() });
 	}
 }
