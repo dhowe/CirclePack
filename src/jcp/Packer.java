@@ -2,16 +2,14 @@ package jcp;
 
 import java.util.ArrayList;
 
+import app.ImagesInRect;
 import jcp.util.*;
 
 public class Packer {
 
 	public Ellipse bounds;
-	public Rect[] mer;
-	public Rect[] rec;
-	public float ratio;
-	float width;
-	float height;
+	public Rect[] mer, rec;
+	public float ratio, width, height;
 	int steps, maxOverlapArea = 300;
 
 	public Packer(Rect[] r, float cw, float ch) {
@@ -22,7 +20,7 @@ public class Packer {
 		this.ratio = cw / ch;
 		this.bounds = new Ellipse(Math.round(cw / 2f), Math.round(ch / 2f), cw, ch);
 		// sortByMaxEdge(r);
-		sortByArea(r);
+		sortByArea(r, ImagesInRect.REVERSE_SORT);
 
 		if (r.length > 0 && r[0] instanceof IRect) {
 			System.out.println();
@@ -168,12 +166,17 @@ public class Packer {
 	}
 
 	void sortByArea(Rect[] r) {
+		sortByArea(r, false);
+	}
+	
+	void sortByArea(Rect[] r, boolean reverse) {
 
 		java.util.Arrays.sort(r, new java.util.Comparator<Rect>() {
 
 			public int compare(Rect b, Rect a) {
 
-				return Float.compare(a.width * a.height, b.width * b.height);
+				int res = Float.compare(a.width * a.height, b.width * b.height);
+				return reverse ? res * -1 : res;
 			}
 		});
 	}

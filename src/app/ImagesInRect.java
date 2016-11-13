@@ -12,10 +12,11 @@ public class ImagesInRect extends PApplet {
 
 	///////////////////////// Configuration ///////////////////////////////////
 	
+	
 	String INPUT_DIR = USER_HOME + "/Desktop/AdCollage/759-ad-images"; // images here
 	String OUTPUT_DIR = USER_HOME + "/Desktop";	// [s]ave to this dir
-	int MAX_NUM_IMAGES = -1; // -1 for unlimited, files/dirs prefixed with '_' are ignored
-		
+	int MAX_NUM_IMAGES = 200; // -1 for unlimited, files/dirs prefixed with '_' are ignored
+	public static boolean REVERSE_SORT = true; // start with smaller ads [not recommended] 	
 	/////////////////////////////////////////////////////////////////////////
 	
 	static String USER_HOME = System.getProperty("user.home");
