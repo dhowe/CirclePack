@@ -94,7 +94,7 @@ public class Images {
 
 			pi = new IRect(new javax.swing.ImageIcon(bytes).getImage(), file.getName());
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 
 			System.err.println("[WARN] " + e.getMessage());
 		}
@@ -221,7 +221,7 @@ public class Images {
 					// else System.err.println("SKIP: "+file);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

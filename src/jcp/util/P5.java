@@ -10,7 +10,6 @@ public abstract class P5 {
 
 	public static void drawRect(PApplet p, Rect r) {
 		p.rect(r.x, r.y, r.width, r.height);
-
 	}
 
 	public static void drawPoint(PApplet p, Pt pt) {

@@ -10,7 +10,7 @@ import processing.event.MouseEvent;
 
 public class ElCirclePacking extends PApplet {
 
-	String OUTPUT_DIR = "/Users/dhowe/Desktop/AdCollage/renders";
+	String OUTPUT_DIR = "/Users/dhowe/Desktop/renders";
 
 	boolean paused = false;
 	float minZoom = .1f, zoom = .1f;
@@ -23,7 +23,7 @@ public class ElCirclePacking extends PApplet {
 
 	public void init() {
 
-		imgs = CPU.loadIRects("/Users/dhowe/Desktop/AdCollage/AdsByBrand/Groups/HK");
+		imgs = CPU.loadIRects("/Volumes/MEDIA/Ads/AdCollage/Groups/HK");
 		packer = new ElPacker(imgs, width, height);
 		if (paused)
 			advance();

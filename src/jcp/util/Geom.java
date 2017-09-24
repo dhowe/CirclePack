@@ -53,6 +53,8 @@ public class Geom {
 		return boundingEllipse(r, cx, cy, ratio).area();
 	}
 
+
+	
 	public static Ellipse boundingEllipse(Rect[] r, int cx, int cy, float ratio) {
 
 		Rect rect = Geom.alignedBoundingRect(r, cx, cy);
@@ -100,7 +102,7 @@ public class Geom {
 		return new Rect(cx - w, cy - h, w * 2, h * 2);
 	}
 
-	static Rect boundingRect(Rect[] r) {
+	public static Rect boundingRect(Rect[] r) {
 
 		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = -Integer.MAX_VALUE, maxY = -Integer.MAX_VALUE;
 

@@ -2,7 +2,7 @@ package jcp.util;
 
 import java.util.ArrayList;
 
-public class Rect {
+public class Rect implements Bounded {
 
 	public int x, y, width, height;
 
@@ -186,9 +186,42 @@ public class Rect {
 		return "[" + x + ", " + y + ", " + width + ", " + height + "]";
 	}
 	
+	@Override
+	public int height() {
+
+		return height;
+	}
+
+	@Override
+	public int width() {
+
+		return width;
+	}
+
+	@Override
+	public int x() {
+
+		return x;
+	}
+
+	@Override
+	public int y() {
+
+		return y;
+	}
+
+	@Override
+	public void width(int i) {
+		this.width = i;
+	}
+
+	@Override
+	public void height(int i) {
+		this.height = i;
+	}
+	
 	public static void main(String[] args) {
 
 		System.out.println(new Rect(0, 0, 12, 4).area() / Math.PI); // ~12
 	}
-
 }

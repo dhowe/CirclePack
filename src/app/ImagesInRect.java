@@ -11,53 +11,29 @@ import processing.event.MouseEvent;
 public class ImagesInRect extends PApplet {
 
 	///////////////////////// Configuration ///////////////////////////////////
+
+	String INPUT_DIR = USER_HOME + "/Desktop/BerthaAll";//  files/dirs prefixed with '_' are ignored
+	String OUTPUT_DIR = USER_HOME + "/Desktop"; 				// [s]ave renders to this dir
+	int MAX_NUM_IMAGES = -1; 														// max to load, or -1 for unlimited
+	boolean REVERSE_SORT = false; 											// start with smaller ads [not recommended]
 	
-	
-	String INPUT_DIR = USER_HOME + "/Desktop/AdCollage/759-ad-images"; // images here
-	String OUTPUT_DIR = USER_HOME + "/Desktop";	// [s]ave to this dir
-	int MAX_NUM_IMAGES = -1; // -1 for unlimited, files/dirs prefixed with '_' are ignored
-	public static boolean REVERSE_SORT = false; // start with smaller ads [not recommended] 	
 	/////////////////////////////////////////////////////////////////////////
-	
+
 	static String USER_HOME = System.getProperty("user.home");
-	
+
 	int ts, animateMs;
 	boolean paused = false;
-	float panX, panY, zoom = .2f;
-	String mousedOver = "";
+	float panX, panY, zoom = .1f;
+	IRect imgs[], inspected;
 	Packer packer;
-	IRect[] imgs;
 
-	
 	public void settings() {
-		size(2000, 1000); 						// size determines aspect ratio for packing
+
+		size(1600, 1000); // size determines aspect ratio for packing
 	}
 	
-	public void init() {
-		
-		imgs = Images.loadAsIRects(INPUT_DIR, MAX_NUM_IMAGES);
-		if (imgs.length < 1) throw new RuntimeException("No images found");
-		packer = new Packer(imgs, width, height);
-		if (paused) advance();
-	}
-
-	static String[] getFolders(String path) {
-		List<String> files = new ArrayList<String>();
-		folders(files, new File(path));
-		return files.toArray(new String[0]);
-	}
-	
-	static public void folders(List<String> files, File file) {
-			if (file.isDirectory()) {
-				files.add(file.getPath());
-				File[] children = file.listFiles();
-		    for (File child : children) {
-		    	folders(files, child);
-		    }
-			}
-	}
-
 	public void setup() {
+
 		surface.setLocation(1200, 0);
 		init();
 	}
@@ -66,34 +42,103 @@ public class ImagesInRect extends PApplet {
 
 		background(255);
 
-		if (!packer.complete())
-			drawNext(getGraphics());
+		if (!packer.complete()) drawNext(getGraphics());
 
 		drawInfo(true);
-		
+
 		panX = (1 - zoom) * width / 2;
 		panY = (1 - zoom) * height / 2;
+
+		pushMatrix();
+
 		translate(panX, panY);
 		scale(zoom);
 
-		//drawMer();
+		// drawMer();
 		drawPack(getGraphics());
-		//drawBounds();
+		// drawBounds();
 		drawMouseOvers();
+
+		popMatrix();
+
+		drawInspected();
 
 		if (!paused && (millis() - ts >= animateMs)) {
 			advance();
 		}
 	}
 
-	private void drawMouseOvers() {
-		mousedOver = "";
-		float mx = (mouseX-panX) / zoom;
-		float my = (mouseY-panY) / zoom;
+	public void init() {
+
+		try {
+			imgs = Images.loadAsIRects(INPUT_DIR, MAX_NUM_IMAGES);
+			if (imgs.length < 1) throw new RuntimeException("No images found");
+			packer = new Packer(imgs, width, height);
+			if (paused) advance();
+		}
+		catch (RuntimeException e) {
+			System.err.println("CAUGHT");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	static String[] getFolders(String path) {
+
+		List<String> files = new ArrayList<String>();
+		folders(files, new File(path));
+		return files.toArray(new String[0]);
+	}
+
+	static public void folders(List<String> files, File file) {
+
+		if (file.isDirectory()) {
+			files.add(file.getPath());
+			File[] children = file.listFiles();
+			for (File child : children) {
+				folders(files, child);
+			}
+		}
+	}
+
+	private void drawInspected() {
+
+		if (inspected != null) {
+			PImage pimg = inspected.image;
+			// image(pimg, width/2f-pimg.width/2f, height/2f-pimg.height/2f);
+			image(pimg, width - pimg.width, 25);
+			text(inspected.name, width - (textWidth(inspected.name) + 10), 20);
+		}
+	}
+
+	public void mouseClicked() {
+
+		float mx = (mouseX - panX) / zoom;
+		float my = (mouseY - panY) / zoom;
 		for (int i = 0; i < packer.rec.length; i++) {
 			IRect ir = (IRect) packer.rec[i];
 			if (ir.contains(mx, my)) {
-				mousedOver = "image: "+ir.name;
+				deleteImage(ir.name);
+			}
+		}
+	}
+
+	private void deleteImage(String imageName) {
+
+		System.out.println("IMPLEMENT: delete " + imageName);
+
+	}
+
+	private void drawMouseOvers() {
+
+		inspected = null;
+		float mx = (mouseX - panX) / zoom;
+		float my = (mouseY - panY) / zoom;
+		for (int i = 0; i < packer.rec.length; i++) {
+			IRect ir = (IRect) packer.rec[i];
+			if (ir.contains(mx, my)) {
+				inspected = ir;
 			}
 		}
 	}
@@ -103,19 +148,19 @@ public class ImagesInRect extends PApplet {
 		// drawMouseCoords();
 		fill(0);
 		text("[p]ause, [r]eset, [c]lear, [s] to save, space-bar to step, mouse-wheel to zoom", 10, 20);
-		int percent = (int)(packer.percent()*100);
-		text("zoom: "+zoom, 10, 40);
-		text("aspect: "+packer.ratio, 10, 60);
-		text("images: "+packer.rec.length, 10, 80);
-		text("status: "+(percent<100 ? percent+"%" : "done"), 10, 100);
-		text(mousedOver, 10, 120);		
+		int percent = (int) (packer.percent() * 100);
+		text("zoom: " + zoom, 10, 40);
+		text("aspect: " + packer.ratio, 10, 60);
+		text("images: " + packer.rec.length, 10, 80);
+		text("status: " + (percent < 100 ? percent + "%" : "done"), 10, 100);
 	}
-	
-	public void drawNext(PGraphics p) { /* no-op */ }
+
+	public void drawNext(PGraphics p) {
+
+		/* no-op */ }
 
 	public void drawPack(PGraphics p) {
 
-		
 		noStroke();
 		for (int i = 0; i < packer.rec.length; i++) {
 			IRect ir = (IRect) packer.rec[i];
@@ -133,29 +178,29 @@ public class ImagesInRect extends PApplet {
 
 		noFill();
 		stroke(255, 0, 255);
-		
-		P5.drawEllipse(this, packer.bounds);
-		
+
+		if (packer.bounds instanceof Ellipse) P5.drawEllipse(this, (Ellipse) packer.bounds);
+
+		if (packer.bounds instanceof Rect) P5.drawRect(this, (Rect) packer.bounds);
+
 		stroke(0);
 		strokeWeight(3);
-		Rect rect = Geom.alignedBoundingRect(packer.placed(), packer.bounds.x,packer.bounds.y);
+		Rect rect = Geom.alignedBoundingRect(packer.placed(), packer.bounds.x(), packer.bounds.y());
 		P5.drawRect(this, rect);
-		
-		float diam = Geom.boundingCircle(packer.placed(), packer.bounds.x,packer.bounds.y);
-		ellipse(Math.round(width / 2f), Math.round(height / 2f),diam, diam);
-		
-		
+
+		float diam = Geom.boundingCircle(packer.placed(), packer.bounds.x(), packer.bounds.y());
+		ellipse(Math.round(width / 2f), Math.round(height / 2f), diam, diam);
+
 		strokeWeight(1);
 		stroke(0, 155, 155);
-		ellipse(Math.round(width / 2f), Math.round(height / 2f),5,5);
+		ellipse(Math.round(width / 2f), Math.round(height / 2f), 5, 5);
 	}
 
 	void drawMer() {
 
 		pushMatrix();
 		stroke(100);
-		translate(packer.bounds.x - Math.round(packer.bounds.width / 2f),
-				packer.bounds.y - Math.round(packer.bounds.height / 2f));
+		translate(packer.bounds.x() - Math.round(packer.bounds.width() / 2f), packer.bounds.y() - Math.round(packer.bounds.height() / 2f));
 		Rect[] r = packer.mer;
 
 		for (int i = 0; r != null && i < r.length; i++) {
@@ -169,6 +214,7 @@ public class ImagesInRect extends PApplet {
 	}
 
 	public void advance() {
+
 		advance(true);
 	}
 
@@ -182,13 +228,15 @@ public class ImagesInRect extends PApplet {
 	}
 
 	public void keyPressed() {
-		//System.out.println(key+" "+keyCode);
+
+		// System.out.println(key+" "+keyCode);
 		if (key == ' ') {
 			if (paused)
 				advance();
 			else
 				paused = true;
-		} else if (key == 'p')
+		}
+		else if (key == 'p')
 			paused = !paused;
 		else if (key == 'c') {
 			noLoop();
@@ -197,13 +245,14 @@ public class ImagesInRect extends PApplet {
 			packer.reset();
 			advance();
 			loop();
-		} else if (key == 'r') {
+		}
+		else if (key == 'r') {
 			packer.reset();
-			if (paused)
-				advance();
-		} else if (key == 's') {
+			if (paused) advance();
+		}
+		else if (key == 's') {
 			paused = true;
-			render(OUTPUT_DIR, packer.bounds.width, packer.bounds.height);
+			render(OUTPUT_DIR, packer.bounds.width(), packer.bounds.height());
 		}
 		else if (keyCode == 38) {
 			paused = true;
@@ -216,31 +265,32 @@ public class ImagesInRect extends PApplet {
 		float e = event.getCount();
 		if (e < 0 && zoom < 2)
 			zoom *= 1.2;
-		else if (e > 0 && zoom > .05)
-			zoom /= 1.2;
-		
-		zoom = min(zoom,1);
+		else if (e > 0 && zoom > .05) zoom /= 1.2;
+
+		zoom = min(zoom, 1);
 	}
 
 	public void render(String outDir, float w, float h) {
-		
-		System.out.println("Rendering to a "+w+"x"+h+" canvas");
+
+		System.out.println("Rendering to a " + w + "x" + h + " canvas");
 		if (!outDir.endsWith("/")) outDir += "/";
-		String name = outDir + "AdRender_"+System.currentTimeMillis() + ".png";
-		PGraphics p = createGraphics((int)w, (int)h);
+		String name = outDir + "AdRender_" + System.currentTimeMillis() + ".png";
+		PGraphics p = createGraphics((int) w, (int) h);
 		p.beginDraw();
 		p.background(255);
 		p.translate((p.width - width) / 2f, (p.height - height) / 2f);
 		p.stroke(200);
 		drawPack(p);
 		p.endDraw();
-		if (p.save(name))
+		boolean ok = p.save(name);
+		if (ok && new File(name).exists())
 			System.out.println("Wrote " + name);
 		else
 			System.err.println("Write failed for: " + name);
 	}
 
 	public static void main(String[] args) {
+
 		PApplet.main(new String[] { ImagesInRect.class.getName() });
 	}
 }

@@ -1,7 +1,7 @@
 package jcp.util;
 
 
-public class Ellipse {
+public class Ellipse implements Bounded {
 
 	public static final float SQRT2 = (float) Math.sqrt(2);
 
@@ -65,4 +65,37 @@ public class Ellipse {
 		System.out.println(new Ellipse(0, 0, 12, 4).area() / Math.PI); // ~12
 	}
 
+	@Override
+	public int height() {
+
+		return height;
+	}
+
+	@Override
+	public int width() {
+
+		return width;
+	}
+
+	@Override
+	public int x() {
+
+		return x;
+	}
+
+	@Override
+	public int y() {
+
+		return y;
+	}
+	
+	@Override
+	public void width(int i) {
+		this.width = i;
+	}
+
+	@Override
+	public void height(int i) {
+		this.height = i;
+	}
 }
